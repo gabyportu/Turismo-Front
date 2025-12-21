@@ -1,1 +1,252 @@
-/* You can add global styles to this file, and also import other style files */
+/* ======================================= */
+/* 1. IMPORTS Y CONFIGURACIÓN BASE         */
+/* ======================================= */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Usar el tema preconstruido de Material, o mejor aún, uno personalizado */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+/* Sobrescribe la fuente a Poppins para compatibilidad con Material si es necesario */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif !important; 
+    background: #f8f9fa; /* Esto será ignorado por 'bg-light' en el body, pero es buena práctica */
+}
+
+.cdk-overlay-container {
+    z-index: 1000 !important;
+}
+
+*{
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* ======================================= */
+/* 2. ESTILOS ACORDADOS DE FORMULARIO      */
+/* ======================================= */
+
+/* --- Estilos para texto negro --- */
+
+/* Texto escrito en el input y color del cursor */
+.mat-mdc-form-field .mat-mdc-input-element {
+    caret-color: black; 
+    color: black !important;
+}
+
+/* Etiqueta, placeholder e Íconos a Negro */
+.mat-mdc-form-field.mat-focused .mat-mdc-floating-label,
+.mat-mdc-form-field:not(.mat-focused) .mat-mdc-floating-label,
+.mat-mdc-form-field .mat-mdc-input-element::placeholder {
+    color: black !important;
+    opacity: 0.7;
+}
+.mat-mdc-form-field .mat-icon {
+    color: black;
+}
+
+/* --- Ocultar la línea del medio (muesca) --- */
+
+/* Oculta la "muesca" en el borde del mat-form-field */
+.mat-mdc-form-field-flex .mat-mdc-notched-outline div {
+    border-style: none !important; 
+}
+
+/* Asegura un borde superior continuo */
+.mat-mdc-form-field-flex .mat-mdc-notched-outline {
+    border-top: 1px solid currentColor !important;
+}
+
+/* --- Estados de Validación (Verde para éxito) --- */
+
+/* Usando el color 'success' de Tailwind: #2E7D32 */
+.mat-mdc-form-field.ng-valid:not(.mat-form-field-invalid) {
+    /* Color de la etiqueta cuando está activa */
+    --mat-mdc-form-field-focus-label-text-color: #2E7D32 !important; 
+    /* Color de la línea de foco/borde activo */
+    --mat-mdc-form-field-focus-active-indicator-color: #2E7D32 !important; 
+    /* Color del borde de la outline */
+    --mat-mdc-form-field-focus-outline-color: #2E7D32 !important; 
+    /* Color del texto */
+    color: #2E7D32 !important;
+}
+
+/* Estado INVÁLIDO (Color Rojo por defecto para errores) */
+.mat-mdc-form-field.ng-invalid:not(.ng-pristine) {
+    /* Solo se activa si el campo ha sido tocado (not .ng-pristine) */
+    --mat-mdc-form-field-focus-label-text-color: red !important;
+    --mat-mdc-form-field-focus-outline-color: red !important;
+    color: red !important;
+}
+
+
+/* ======================================= */
+/* ELIMINAR FONDOS GRISES EN TODA LA APP */
+/* ======================================= */
+
+/* Elimina fondo gris global de componentes Material */
+.mat-mdc-card,
+.mat-mdc-tab-body,
+.mat-mdc-tab-body-content,
+.mat-mdc-tab-group,
+.mat-mdc-dialog-container,
+.mat-mdc-menu-panel,
+.mat-mdc-select-panel,
+.mat-mdc-paginator,
+.mat-mdc-table,
+.mat-mdc-expansion-panel,
+.mat-mdc-form-field,
+.mat-mdc-tab-header,
+.mat-mdc-snack-bar-container {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Asegura que el color de texto se mantenga visible */
+.mat-mdc-card,
+.mat-mdc-tab-body-content,
+.mat-mdc-dialog-container {
+  color: #1f2937 !important; /* Texto gris oscuro */
+}
+
+/* Fondo de toda la app (si quieres que use tu imagen o color claro) */
+html, body {
+  background-color: transparent !important;
+  background: none !important;
+}
+
+/* Si usas imágenes con Tailwind (como bg-salar), esto deja que se vean */
+body {
+  background-image: none !important;
+}
+
+/* Corrige overlays (por ejemplo, modales) */
+.cdk-overlay-container,
+.cdk-overlay-pane {
+  background: transparent !important;
+}
+
+/* FORZAR QUE matSuffix SEA VISIBLE */
+::ng-deep .mat-mdc-form-field-icon-suffix,
+::ng-deep .mat-mdc-form-field mat-icon[matSuffix] {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: #6A1B9A !important; /* o plomo si quieres */
+  margin-right: 6px !important;
+}
+
+::ng-deep .mat-mdc-form-field-infix {
+  padding-top: 20px !important;
+  padding-bottom: 8px !important;
+}
+
+/* ======================================= */
+/* FONDO BLANCO GLOBAL DE STEPPER Y STEPS  */
+/* ======================================= */
+::ng-deep .mat-mdc-tab-body-wrapper,
+::ng-deep .mat-mdc-tab-body,
+::ng-deep .mat-mdc-tab-body-content,
+::ng-deep .mat-mdc-tab-body-active,
+::ng-deep app-step1-company,
+::ng-deep app-step2-company,
+::ng-deep app-step3-company,
+::ng-deep .upload-zone,
+::ng-deep .mat-mdc-form-field {
+    background-color: #ffffff !important; /* Blanco puro */
+}
+
+/* Sobrescribir gradientes de upload-zone de cada step */
+::ng-deep app-step1-company .upload-zone {
+    background: #ffffff !important;
+}
+::ng-deep app-step3-company .upload-zone {
+    background: #ffffff !important;
+}
+
+/* Sobrescribir mat-card */
+::ng-deep mat-card.mat-mdc-card {
+    background-color: #ffffff !important;
+}
+
+/* Mantener borde y sombra si quieres */
+.upload-zone {
+    border: 3px dashed #6A1B9A !important;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.4s ease;
+    cursor: pointer;
+    background-color: #ffffff !important;
+
+}
+
+.upload-zone:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(106,27,154,0.3);
+}
+
+
+/* ======================================= */
+/* FORZAR FONDO BLANCO EN STEPPER Y STEPS */
+/* ======================================= */
+::ng-deep .mat-horizontal-stepper,
+::ng-deep .mat-stepper-horizontal,
+::ng-deep .mat-mdc-stepper-horizontal,
+::ng-deep .mat-mdc-stepper-horizontal .mat-mdc-step-body,
+::ng-deep .mat-step-body,
+::ng-deep .mat-mdc-tab-body-wrapper,
+::ng-deep .mat-mdc-tab-body,
+::ng-deep .mat-mdc-tab-body-content,
+::ng-deep .mat-mdc-tab-body-active,
+::ng-deep app-step1-company,
+::ng-deep app-step2-company,
+::ng-deep app-step3-company,
+::ng-deep .upload-zone,
+::ng-deep .mat-mdc-form-field {
+    background-color: #ffffff !important; /* blanco puro */
+    backdrop-filter: none !important; /* elimina blur que deja ver fondo plomo */
+    box-shadow: none !important;
+}
+
+/* Forzar upload zones blancas */
+::ng-deep app-step1-company .upload-zone,
+::ng-deep app-step3-company .upload-zone {
+    background-color: #ffffff !important;
+    border-color: #6A1B9A !important; /* conserva borde visible */
+}
+
+/* Forzar mat-card blanco */
+::ng-deep mat-card.mat-mdc-card {
+    background-color: #ffffff !important;
+    backdrop-filter: none !important;
+}
+
+mat-card.mat-mdc-card {
+  backdrop-filter: none !important;
+  background-color: #ffffff !important;
+}
+
+.mat-icon {
+  font-family: 'Material Icons' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+
+
+

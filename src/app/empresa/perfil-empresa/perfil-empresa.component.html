@@ -1,0 +1,124 @@
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-purple-50 to-green-50 font-poppins">
+
+  <!-- HEADER BANDERA -->
+  <header class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="h-1.5 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
+    <div class="max-w-7xl mx-auto px-8 py-6 flex justify-between items-center">
+      <a routerLink="/home" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-emerald-600">
+        Susurros de Bolivia
+      </a>
+      <a routerLink="/home" class="text-purple-700 font-bold text-lg hover:underline">Volver al inicio</a>
+    </div>
+  </header>
+
+  <!-- BANNER + LOGO CENTRADO -->
+  <div class="relative h-64 bg-gradient-to-r from-purple-700 to-emerald-700 overflow-hidden">
+    <img [src]="empresa.banner" class="w-full h-full object-cover opacity-70">
+    <div class="absolute inset-0 bg-black/40"></div>
+
+    <div class="absolute inset-0 flex items-center justify-center -bottom-20">
+      <img [src]="empresa.logo"
+           class="w-48 h-48 rounded-full border-10 border-white shadow-2xl object-cover">
+    </div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <section class="max-w-7xl mx-auto px-8 pt-24 pb-20">
+
+    <!-- NOMBRE + ESTRELLAS -->
+    <div class="text-center mb-10">
+      <h1 class="text-6xl md:text-7xl font-black text-purple-800 mb-4">{{ empresa.nombre }}</h1>
+      
+      <div class="flex items-center justify-center gap-4">
+        <div class="flex text-yellow-500 text-4xl">
+          <!-- Estrellas llenas -->
+          <mat-icon *ngFor="let i of [].constructor(getEstrellasLlenas(empresa.calificacion))">star</mat-icon>
+          <!-- Media estrella -->
+          <mat-icon *ngIf="tieneMediaEstrella(empresa.calificacion)">star_half</mat-icon>
+          <!-- Estrellas vacías -->
+          <mat-icon *ngFor="let i of [].constructor(5 - getEstrellasLlenas(empresa.calificacion) - (tieneMediaEstrella(empresa.calificacion) ? 1 : 0))">
+            star_border
+          </mat-icon>
+        </div>
+        <span class="text-3xl font-bold text-purple-700">{{ empresa.calificacion }}</span>
+        <span class="text-xl text-gray-600">({{ empresa.totalResenas }} reseñas)</span>
+      </div>
+      <p class="text-xl text-gray-600 mt-4">Desde {{ empresa.desde }} • Empresa verificada</p>
+    </div>
+
+    <!-- DESCRIPCIÓN -->
+    <div class="text-center max-w-4xl mx-auto mb-16">
+      <p class="text-xl leading-relaxed text-gray-700">{{ empresa.descripcion }}</p>
+    </div>
+
+    <!-- BOTONES CONTACTO -->
+    <div class="flex justify-center gap-8 mb-16">
+      <a [href]="'https://wa.me/' + empresa.whatsapp.replace('+','')" target="_blank"
+         class="flex items-center gap-4 bg-emerald-600 text-white px-10 py-6 rounded-full font-bold text-2xl shadow-2xl hover:scale-110 transition">
+        <mat-icon class="text-4xl">whatsapp</mat-icon>
+        WhatsApp
+      </a>
+      <a [href]="'https://facebook.com/' + empresa.facebook" target="_blank"
+         class="flex items-center gap-4 bg-blue-700 text-white px-10 py-6 rounded-full font-bold text-2xl shadow-2xl hover:scale-110 transition">
+        <mat-icon class="text-4xl">facebook</mat-icon>
+        Facebook
+      </a>
+      <a [href]="'https://instagram.com/' + empresa.instagram" target="_blank"
+         class="flex items-center gap-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-10 py-6 rounded-full font-bold text-2xl shadow-2xl hover:scale-110 transition">
+        <mat-icon class="text-4xl">instagram</mat-icon>
+        Instagram
+      </a>
+    </div>
+
+    <!-- BOTÓN PUBLICAR NUEVA OFERTA -->
+    <div class="text-center mb-20">
+      <button (click)="crearNuevaOferta()"
+              class="bg-gradient-to-r from-purple-700 to-emerald-600 text-white px-24 py-12 rounded-3xl font-black text-5xl shadow-2xl hover:shadow-purple-600/60 transform hover:scale-105 transition flex items-center justify-center gap-8 mx-auto">
+        <mat-icon class="text-7xl">add_circle</mat-icon>
+        PUBLICAR NUEVA OFERTA
+      </button>
+    </div>
+
+    <!-- MIS OFERTAS -->
+    <h2 class="text-5xl font-black text-center text-purple-800 mb-16">
+      Mis Ofertas Publicadas
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+      <div *ngFor="let s of empresa.servicios"
+           class="bg-white rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition transform hover:-translate-y-4 cursor-pointer border-4 border-purple-100 hover:border-purple-400"
+           routerLink="/oferta/{{s.id}}">
+        
+        <img [src]="s.imagen" class="w-full h-64 object-cover">
+        
+        <div class="p-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-4 line-clamp-2">{{ s.titulo }}</h3>
+          
+          <div class="flex justify-between items-end mt-8">
+            <div>
+              <p class="text-5xl font-black text-purple-700">{{ s.precio }} Bs</p>
+              <p class="text-gray-600 text-lg">{{ s.duracion }}</p>
+            </div>
+            <div class="text-right">
+              <div class="flex text-yellow-500 text-2xl">
+                <mat-icon *ngFor="let i of [1,2,3,4,5]">
+                  {{ i <= s.calificacion ? 'star' : 'star_border' }}
+                </mat-icon>
+              </div>
+              <p class="text-gray-600">({{ s.resenas }})</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIN OFERTAS -->
+    <div *ngIf="empresa.servicios.length === 0" class="text-center py-20">
+      <p class="text-4xl text-gray-500 mb-8">Aún no has publicado ninguna oferta</p>
+      <button (click)="crearNuevaOferta()" class="text-2xl text-purple-700 font-bold underline">
+        ¡Publica tu primera aventura ahora!
+      </button>
+    </div>
+
+  </section>
+</div>

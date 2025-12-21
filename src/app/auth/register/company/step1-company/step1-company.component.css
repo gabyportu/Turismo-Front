@@ -1,0 +1,90 @@
+.step-container {
+  padding: 20px;
+}
+
+.step-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #5B2E8C;
+  margin-bottom: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+/* ================= ICONOS MORADOS ================== */
+.icon-purple {
+  color: #5B2E8C !important;
+}
+
+/* ================= FORM FIELD BORDE MORADO ================== */
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: #5B2E8C !important;
+  --mdc-outlined-text-field-hover-outline-color: #5B2E8C !important;
+  --mdc-outlined-text-field-focus-outline-color: #5B2E8C !important;
+  --mdc-outlined-text-field-error-outline-color: #E53935 !important;
+}
+
+.mdc-notched-outline__leading,
+.mdc-notched-outline__trailing,
+.mdc-notched-outline__notch {
+  border-width: 2px !important;
+  border-radius: 10px !important;
+}
+
+/* Padding input */
+.mat-mdc-text-field .mdc-text-field__input {
+  padding: 10px !important;
+}
+
+/* Borde rojo cuando inválido */
+.mat-form-field-invalid .mdc-notched-outline {
+  border-color: #E53935 !important;
+}
+
+/* ================= BOTONES ================== */
+.buttons-two {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mat-mdc-raised-button {
+  background-color: #5B2E8C !important;
+  color: white !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+}
+
+.logo-upload-section {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.logo-preview img {
+  margin-top: 8px;
+  max-width: 150px;
+  border-radius: 8px;
+  border: 1px solid #5B2E8C;
+}
+
+/* Hover efectos */
+.mat-mdc-raised-button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(91, 46, 140, 0.4);
+}
+
+.custom-upload-btn mat-icon {
+  vertical-align: middle;
+}

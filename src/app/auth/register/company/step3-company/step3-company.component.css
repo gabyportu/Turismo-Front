@@ -1,0 +1,103 @@
+.step-container {
+  padding: 20px;
+}
+
+.step-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #5B2E8C;
+  margin-bottom: 10px;
+}
+
+.desc {
+  margin-bottom: 20px;
+  color: #4f4f4f;
+}
+
+.upload-area {
+  display: grid;
+  gap: 16px;
+}
+
+.file-box label {
+  display: block;
+  color: #5B2E8C;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+/* Botón de subir archivo personalizado */
+.custom-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #5B2E8C !important;
+  color: white !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  border: none;
+}
+
+.custom-upload-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(91, 46, 140, 0.4);
+}
+
+.file-box input[type="file"] {
+  display: none; /* ocultamos input real */
+}
+
+/* Vista previa de archivos */
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  color: #5B2E8C;
+  font-weight: 500;
+}
+
+.icon-purple {
+  color: #5B2E8C !important;
+}
+
+/* Botones Volver y Finalizar */
+.buttons-two {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Botón Finalizar (Raised) */
+.mat-mdc-raised-button, button.mat-raised-button, .finalizar-btn {
+  background-color: #5B2E8C !important;
+  color: white !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+  cursor: pointer;
+}
+
+.mat-mdc-raised-button:hover, button.mat-raised-button:hover, .finalizar-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(91, 46, 140, 0.4);
+}
+
+/* Botón Volver (Outlined) */
+.mat-mdc-outlined-button, button.mat-stroked-button, .volver-btn {
+  border-color: #5B2E8C !important;
+  color: #5B2E8C !important;
+  border-width: 2px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+  background-color: white !important;
+  cursor: pointer;
+}
+
+.mat-mdc-outlined-button:hover, button.mat-stroked-button:hover, .volver-btn:hover {
+  background-color: #f5f0fa !important;
+}

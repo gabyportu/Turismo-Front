@@ -1,0 +1,82 @@
+<!-- BOTÓN FLOTANTE -->
+<button *ngIf="!chatAbierto && !listaAbierta"
+        (click)="abrirLista()"
+        class="fixed bottom-8 right-8 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white w-16 h-16 rounded-full shadow-2xl hover:scale-110 transition z-50 flex items-center justify-center animate-bounce">
+  <span class="material-icons text-4xl">chat</span>
+</button>
+
+<!-- LISTA DE CONVERSACIONES -->
+<div *ngIf="listaAbierta" class="fixed inset-0 bg-black/60 z-50" (click)="cerrarTodo()">
+  <div class="absolute bottom-0 right-0 w-full max-w-md bg-white rounded-t-3xl shadow-2xl overflow-hidden" 
+       (click)="$event.stopPropagation()">
+    
+    <div class="bg-gradient-to-r from-purple-600 to-emerald-600 text-white p-6 text-center relative">
+      <button (click)="cerrarTodo()" class="absolute left-6 top-6">
+        <span class="material-icons text-3xl">close</span>
+      </button>
+      <h3 class="text-2xl font-black">Mis Chats</h3>
+      <p class="text-sm opacity-90">Conversaciones con operadores</p>
+    </div>
+
+    <div class="max-h-96 overflow-y-auto p-4 space-y-3">
+      <div *ngFor="let conv of conversaciones"
+           (click)="abrirChatDirecto(conv.empresa)"
+           class="flex items-center gap-4 p-5 bg-gradient-to-r from-purple-50 to-emerald-50 rounded-2xl hover:shadow-lg cursor-pointer transition transform hover:scale-105">
+        <div class="w-14 h-14 bg-gradient-to-br from-purple-600 to-emerald-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+          {{ conv.empresa.charAt(0) }}
+        </div>
+        <div class="flex-1">
+          <p class="font-bold text-lg text-purple-800">{{ conv.empresa }}</p>
+          <p class="text-sm text-gray-600 truncate">{{ conv.ultimoMensaje }}</p>
+        </div>
+        <p class="text-xs text-gray-500">{{ conv.hora }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT ABIERTO -->
+<div *ngIf="chatAbierto" class="fixed inset-0 bg-black/60 z-50" (click)="cerrarTodo()">
+  <div class="absolute bottom-0 right-0 w-full max-w-md h-[90vh] bg-white rounded-t-3xl shadow-2xl flex flex-col" 
+       (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-emerald-600 text-white p-6 flex items-center gap-4">
+      <button (click)="volverALista()">
+        <span class="material-icons text-3xl">arrow_back</span>
+      </button>
+      <div class="flex-1 text-center">
+        <p class="text-xl font-black">{{ empresaActual }}</p>
+        <p class="text-sm opacity-90">En línea</p>
+      </div>
+    </div>
+
+    <!-- Mensajes -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-4">
+      <div *ngFor="let msg of mensajesActuales"
+           [class]="msg.esMio ? 'flex justify-end' : 'flex justify-start'">
+        <div [class]="msg.esMio 
+              ? 'max-w-xs bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-3xl rounded-tr-none px-6 py-4 shadow-lg'
+              : 'max-w-xs bg-gray-100 text-gray-800 rounded-3xl rounded-tl-none px-6 py-4 shadow'">
+          <p class="text-base">{{ msg.texto }}</p>
+          <p class="text-xs opacity-70 mt-1 text-right">{{ msg.hora }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="p-4 border-t-4 border-purple-100">
+      <div class="flex gap-3">
+        <input type="text" 
+               [(ngModel)]="nuevoMensaje" 
+               (keyup.enter)="enviarMensaje()"
+               placeholder="Escribe tu mensaje..."
+               class="flex-1 px-6 py-4 rounded-full border-2 border-purple-300 focus:border-purple-600 outline-none text-lg">
+        <button (click)="enviarMensaje()"
+                class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white w-14 h-14 rounded-full shadow-xl hover:scale-110 transition flex items-center justify-center">
+          <span class="material-icons">send</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

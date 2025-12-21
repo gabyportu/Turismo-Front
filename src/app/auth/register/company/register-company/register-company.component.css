@@ -1,0 +1,21 @@
+.step-pill {
+  padding: 12px 26px;
+  border-radius: 9999px;
+  background: #e5e7eb;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.step-pill:hover {
+  transform: translateY(-3px);
+}
+
+.step-pill.active {
+  background: linear-gradient(to right, #7c3aed, #10b981);
+  color: white;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
+}
+.step-pill.active:hover {
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
+}

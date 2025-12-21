@@ -1,0 +1,150 @@
+/* ===================== */
+/* FONDO Y CARD PRINCIPAL */
+/* ===================== */
+.min-h-screen {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+}
+
+.bg-mountains {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+}
+
+.card-turista {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 2rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.card-turista .bar-colors {
+  height: 0.5rem;
+  background: linear-gradient(to right, #D81B1B, #FFD500, #007A33);
+}
+
+/* ===================== */
+/* TITULOS Y SUBTITULOS  */
+/* ===================== */
+.card-turista h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  background: linear-gradient(to right, #7c3aed, #10b981);
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.card-turista p {
+  color: #4f4f4f;
+  font-size: 1.25rem;
+}
+
+/* ===================== */
+/* FORMULARIO             */
+/* ===================== */
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid > * {
+  width: 100%;
+}
+
+/* Material Inputs */
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: #5B2E8C !important;
+  --mdc-outlined-text-field-hover-outline-color: #5B2E8C !important;
+  --mdc-outlined-text-field-focus-outline-color: #5B2E8C !important;
+  --mdc-outlined-text-field-error-outline-color: #E53935 !important;
+  border-radius: 10px !important;
+}
+
+.mat-mdc-text-field .mdc-text-field__input {
+  padding: 10px !important;
+}
+
+.mat-form-field-invalid .mdc-notched-outline {
+  border-color: #E53935 !important;
+}
+
+.mat-icon {
+  color: #5B2E8C !important;
+  font-size: 1.4rem !important;
+}
+
+/* BOTONES */
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.mat-mdc-raised-button {
+  background-color: #5B2E8C !important;
+  color: white !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+}
+
+.mat-mdc-raised-button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(91, 46, 140, 0.4);
+}
+
+.mat-mdc-outlined-button {
+  border-color: #5B2E8C !important;
+  color: #5B2E8C !important;
+  border-width: 2px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+  background-color: white !important;
+}
+
+.mat-mdc-outlined-button:hover {
+  background-color: #f5f0fa !important;
+}
+
+/* FECHA */
+.mat-datepicker-toggle-default-icon,
+.mat-mdc-datepicker-toggle .mat-mdc-icon-button svg {
+  fill: #5B2E8C !important;
+  color: #5B2E8C !important;
+}
+
+/* Botón Registrarse (verde) */
+.btn-registrar {
+  background-color: #10b981 !important; /* verde */
+  color: white !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+  transition: all 0.3s ease;
+}
+
+.btn-registrar:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+}
+
+/* Botón Cancelar (rojo con borde) */
+.btn-cancelar {
+  background-color: white !important;
+  color: #ef4444 !important; /* rojo */
+  border: 2px solid #ef4444 !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+  transition: all 0.3s ease;
+}
+
+.btn-cancelar:hover {
+  background-color: #fee2e2 !important; /* rojo suave */
+  transform: scale(1.03);
+}

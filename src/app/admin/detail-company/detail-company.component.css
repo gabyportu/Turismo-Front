@@ -1,0 +1,61 @@
+:host {
+  font-family: 'Poppins', sans-serif;
+  display: block;
+  min-height: 100vh;
+}
+
+/* FONDO BOLIVIANO */
+.bg-gradient-to-br {
+  background: linear-gradient(135deg, #d4f4dd 0%, #e8daff 50%, #d4f4dd 100%) !important;
+}
+
+/* COLORES PRINCIPALES */
+.text-primary { color: #6a1b9a !important; }
+.text-success { color: #166534 !important; }
+.text-accent { color: #dc2626 !important; }
+
+/* MATERIAL ICONS BONITOS */
+.material-icons {
+  font-family: 'Material Icons' !important;
+  font-size: 1.5rem !important;
+}
+
+/* BOTONES REDONDOS */
+.mat-mdc-icon-button {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  transition: all 0.3s ease;
+}
+
+.mat-mdc-icon-button:hover {
+  transform: scale(1.15) !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
+}
+
+/* TABLA BONITA */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+th {
+  background: linear-gradient(135deg, #e8daff, #d4f4dd) !important;
+  color: #6a1b9a !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+td {
+  background: white;
+  padding: 1.5rem !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+tr:hover td {
+  background: #f3e8ff !important;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}

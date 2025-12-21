@@ -1,0 +1,201 @@
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-purple-50 to-green-50 font-poppins">
+
+  <!-- HEADER CON BANDERA -->
+  <header class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="h-1 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
+    <div class="max-w-7xl mx-auto px-8 py-6 flex justify-between items-center">
+      <a routerLink="/home" class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-emerald-600">
+        Susurros de Bolivia
+      </a>
+      <div class="flex items-center gap-8">
+        <button class="flex items-center gap-2 text-purple-700 hover:text-purple-900 font-medium">
+          <span class="material-icons text-2xl">share</span> Compartir
+        </button>
+        <button class="flex items-center gap-2 text-purple-700 hover:text-purple-900 font-medium">
+          <span class="material-icons text-2xl">favorite_border</span> Guardar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- GALERÍA DE FOTOS ESTILO AIRBNB -->
+  <section class="max-w-7xl mx-auto px-8 py-12">
+    <div class="grid grid-cols-4 gap-4 rounded-3xl overflow-hidden shadow-2xl">
+      <div class="col-span-4 lg:col-span-2 row-span-2">
+        <img [src]="oferta.imagenPrincipal" [alt]="oferta.titulo"
+             class="w-full h-full object-cover cursor-pointer hover:opacity-95 transition">
+      </div>
+      <div class="col-span-2 lg:col-span-1" *ngFor="let foto of oferta.galeria | slice:0:4">
+        <img [src]="foto" alt="Galería"
+             class="w-full h-64 object-cover rounded-xl shadow-md hover:opacity-90 cursor-pointer transition">
+      </div>
+    </div>
+
+    <div class="text-center mt-8">
+      <button class="bg-white border-2 border-purple-700 text-purple-700 px-10 py-5 rounded-full font-bold shadow-xl hover:bg-purple-50 transition flex items-center gap-3 mx-auto text-lg">
+        <span class="material-icons text-3xl">apps</span>
+        Mostrar Video
+      </button>
+    </div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <section class="max-w-7xl mx-auto px-8 py-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+    <!-- COLUMNA IZQUIERDA: INFORMACIÓN + RESEÑAS -->
+    <div class="lg:col-span-2 space-y-12">
+
+      <!-- TÍTULO Y UBICACIÓN -->
+      <div>
+        <h1 class="text-5xl font-black text-gray-900 mb-4 leading-tight">{{ oferta.titulo }}</h1>
+        <p class="text-2xl text-emerald-700 font-bold flex items-center gap-3">
+          <span class="material-icons text-3xl">location_on</span>
+          {{ oferta.destino }}, Bolivia
+        </p>
+      </div>
+
+      <!-- CARACTERÍSTICAS RÁPIDAS -->
+      <div class="flex flex-wrap gap-8 py-8 border-b-2 border-purple-100">
+        <div class="flex items-center gap-4">
+          <span class="material-icons text-purple-700 text-4xl">schedule</span>
+          <div>
+            <p class="font-bold text-xl">{{ oferta.duracion }}</p>
+            <p class="text-gray-600">Duración</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="material-icons text-purple-700 text-4xl">groups</span>
+          <div>
+            <p class="font-bold text-xl">Hasta {{ oferta.capacidad }}</p>
+            <p class="text-gray-600">personas</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="material-icons text-purple-700 text-4xl">trending_up</span>
+          <div>
+            <p class="font-bold text-xl">{{ oferta.dificultad }}</p>
+            <p class="text-gray-600">Dificultad</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESCRIPCIÓN -->
+      <div>
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Sobre esta aventura</h2>
+        <p class="text-lg text-gray-700 leading-relaxed">{{ oferta.descripcion }}</p>
+      </div>
+
+      <!-- ACTIVIDADES INCLUIDAS -->
+      <div class="bg-gradient-to-br from-purple-50 to-emerald-50 rounded-3xl p-10">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Incluye</h2>
+        <div class="grid grid-cols-2 gap-6">
+          <div *ngFor="let act of oferta.actividades" class="flex items-center gap-5">
+            <span class="material-icons text-emerald-700 text-4xl">check_circle</span>
+            <span class="text-xl font-medium text-gray-800">{{ act }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- OPERADOR -->
+      <div class="bg-white border-4 border-purple-200 rounded-3xl p-10 shadow-2xl flex items-center gap-8">
+        <div class="w-32 h-32 bg-gradient-to-br from-purple-600 to-emerald-600 rounded-full flex items-center justify-center text-white text-6xl font-black shadow-2xl">
+          {{ oferta.operador.charAt(0) }}
+        </div>
+        <div>
+          <p class="text-gray-600 text-lg">Organizado por</p>
+          <h3 class="text-4xl font-black text-purple-700">{{ oferta.operador }}</h3>
+          <div class="flex items-center gap-3 mt-3">
+            <div class="flex text-yellow-500">
+              <span class="material-icons text-3xl" *ngFor="let i of [1,2,3,4,5]">
+                {{ i <= oferta.calificacion ? 'star' : 'star_border' }}
+              </span>
+            </div>
+            <span class="text-xl font-bold">{{ oferta.calificacion }}</span>
+            <span class="text-gray-600">({{ oferta.resenas }} reseñas)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <button [routerLink]="['/empresa', getEmpresaId(oferta.operador)]" 
+          class="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-7 rounded-3xl font-bold text-2xl shadow-2xl hover:shadow-purple-500/50 transform hover:scale-105 transition flex items-center justify-center gap-4">
+          <span class="material-icons text-4xl">business_center</span>
+          Ver perfil de {{ oferta.operador }}
+        </button>
+        <button (click)="abrirChatConEmpresa(oferta.operador)"
+          class="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-7 rounded-3xl font-bold text-2xl shadow-2xl hover:shadow-emerald-500/50 transform hover:scale-105 transition flex items-center justify-center gap-4">
+          <span class="material-icons text-4xl">chat</span>
+          Chatear con {{ oferta.operador }}
+        </button>
+      </div>
+
+      <!-- RESEÑAS -->
+      <div class="mt-20">
+        <h2 class="text-4xl font-black text-gray-900 mb-10">Reseñas de aventureros</h2>
+
+        <!-- Formulario de reseña -->
+        <div class="bg-white rounded-3xl border-2 border-purple-100 p-10 shadow-xl mb-12">
+          <h3 class="text-2xl font-bold mb-6">¿Cómo fue tu experiencia?</h3>
+          <div class="flex gap-3 mb-6">
+            <button *ngFor="let i of [1,2,3,4,5]" (click)="calificacionTemp = i"
+                    class="text-6xl transition-all hover:scale-110">
+              <span class="material-icons"
+                    [class.text-yellow-500]="i <= calificacionTemp"
+                    [class.text-gray-300]="i > calificacionTemp">
+                {{ i <= calificacionTemp ? 'star' : 'star_border' }}
+              </span>
+            </button>
+          </div>
+          <textarea class="w-full p-6 border-2 border-purple-200 rounded-2xl focus:border-purple-600 outline-none text-lg" rows="5"
+                    placeholder="Cuéntanos todo..."></textarea>
+          <button class="mt-6 bg-purple-700 text-white px-12 py-5 rounded-full font-bold hover:bg-purple-800 transition shadow-lg">
+            Enviar reseña
+          </button>
+        </div>
+
+        <!-- Reseñas individuales -->
+        <div *ngFor="let r of resenas" class="bg-white rounded-2xl border border-gray-200 p-8 mb-8 shadow-lg">
+          <div class="flex items-center gap-5 mb-5">
+            <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+              {{ r.usuario.charAt(0) }}
+            </div>
+            <div>
+              <p class="text-xl font-bold">{{ r.usuario }}</p>
+              <p class="text-gray-500">{{ r.fecha }}</p>
+            </div>
+          </div>
+          <div class="flex mb-4">
+            <span class="material-icons text-yellow-500 text-2xl" *ngFor="let i of [1,2,3,4,5]">
+              {{ i <= r.estrellas ? 'star' : 'star_border' }}
+            </span>
+          </div>
+          <p class="text-lg text-gray-700">{{ r.comentario }}</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUMNA DERECHA: PRECIO FIJO -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-3xl shadow-2xl border-4 border-purple-200 p-10 sticky top-32 text-center">
+        <p class="text-7xl font-black text-purple-700">{{ oferta.precio }}</p>
+        <p class="text-3xl text-gray-600 mb-6">Bs por persona</p>
+        <div class="flex items-center justify-center gap-3 text-2xl">
+          <span class="material-icons text-yellow-500 text-4xl">star</span>
+          <span class="font-bold">{{ oferta.calificacion }}</span>
+          <span class="text-gray-600">({{ oferta.resenas }})</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER DISCRETO -->
+  <footer class="bg-gray-900 text-white py-16 mt-24">
+    <div class="max-w-7xl mx-auto px-8 text-center">
+      <h3 class="text-4xl font-bold mb-4">Susurros de Bolivia</h3>
+      <p class="text-xl text-gray-400">La plataforma oficial de turismo de aventura boliviana</p>
+      <p class="text-gray-500 mt-8">© 2025 • Hecho con pasión en el corazón de los Andes</p>
+    </div>
+  </footer>
+</div>

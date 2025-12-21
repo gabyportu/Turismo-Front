@@ -1,0 +1,92 @@
+<div class="min-h-screen relative overflow-hidden flex items-center justify-center p-6 font-poppins">
+
+  <!-- ====================== -->
+  <!-- FONDO DE MONTAÑAS (IGUAL AL LOGIN) -->
+  <!-- ====================== -->
+  <div class="fixed inset-0 -z-10">
+    <div class="absolute inset-0 bg-gradient-to-br from-white via-white to-white"></div>
+
+    <svg class="absolute bottom-0 w-full h-96" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path fill="#065f46" opacity="0.6"
+        d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,133.3C672,117,768,139,864,170.7C960,203,1056,245,1152,245.3C1248,245,1344,203,1392,181.3L1440,160L1440,320L0,320Z">
+      </path>
+      <path fill="#064e3b" opacity="0.8"
+        d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,197.3C672,192,768,160,864,160C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L0,320Z">
+      </path>
+      <path fill="#86efac" opacity="0.5"
+        d="M0,288L48,272C96,256,192,224,288,224C384,224,480,256,576,256C672,256,768,224,864,224C960,256,1056,320,1152,320C1248,320,1344,256,1392,224L1440,192L1440,320L0,320Z">
+      </path>
+    </svg>
+
+    <div class="absolute top-16 right-24 w-40 h-40 bg-yellow-200 rounded-full opacity-70 shadow-2xl blur-md"></div>
+    <div class="absolute top-20 right-28 w-32 h-32 bg-yellow-100 rounded-full shadow-inner"></div>
+  </div>
+
+  <!-- ====================== -->
+  <!-- CARD PRINCIPAL -->
+  <!-- ======================s -->
+  <div class="relative z-10 w-full max-w-5xl mx-auto">
+    <mat-card class="overflow-hidden shadow-3xl rounded-3xl backdrop-blur-xl bg-white/92 border border-white/40">
+
+      <!-- Barra de colores -->
+      <div class="h-3 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
+
+      <!-- Título -->
+      <div class="p-10 text-center">
+        <h1 class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-success drop-shadow-lg">
+          Registro de Empresa
+        </h1>
+        <p class="text-2xl font-medium text-gray-700 mt-4">Completa los datos para formar parte de Susurros de Bolivia</p>
+      </div>
+
+      <!-- ====================== -->
+      <!-- STEPPER SUPERIOR -->
+      <!-- ====================== -->
+      <div class="flex justify-center gap-6 mb-10 text-xl">
+
+        <div class="step-pill"
+          [class.active]="currentStep === 1"
+          (click)="goToStep(1)">
+          1. Datos de Empresa
+        </div>
+
+        <div class="step-pill"
+          [class.active]="currentStep === 2"
+          (click)="goToStep(2)">
+          2. Representante
+        </div>
+
+        <div class="step-pill"
+          [class.active]="currentStep === 3"
+          (click)="goToStep(3)">
+          3. Confirmación
+        </div>
+
+      </div>
+
+      <!-- ====================== -->
+      <!-- CONTENIDO DE LOS PASOS -->
+      <!-- ====================== -->
+      <div class="p-10">
+
+        <app-step1-company
+          *ngIf="currentStep === 1"
+          (next)="nextStep()">
+        </app-step1-company>
+
+        <app-step2-company
+          *ngIf="currentStep === 2"
+          (next)="nextStep()"
+          (back)="prevStep()">
+        </app-step2-company>
+
+        <app-step3-company
+          *ngIf="currentStep === 3"
+          (back)="prevStep()">
+        </app-step3-company>
+
+      </div>
+
+    </mat-card>
+  </div>
+</div>

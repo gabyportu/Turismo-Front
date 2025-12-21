@@ -1,0 +1,150 @@
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-purple-50 to-green-50 py-8 px-4 font-poppins">
+  <header class="bg-white shadow-lg rounded-2xl max-w-6xl mx-auto mb-8 sticky top-4 z-50">
+    <div class="h-1.5 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
+    <div class="px-6 py-4 flex justify-between items-center">
+      <a routerLink="/home" class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-emerald-600">
+        Susurros de Bolivia
+      </a>
+      <button (click)="cancelar()" class="text-purple-700 font-medium hover:underline">← Cancelar</button>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-4xl font-black text-center text-purple-800 mb-3">Nueva Aventura</h1>
+    <p class="text-center text-gray-600 mb-10">Sube tus fotos y video para conquistar a los viajeros</p>
+
+    <form [formGroup]="ofertaForm" (ngSubmit)="publicarOferta()" class="bg-white rounded-2xl shadow-xl p-8">
+
+      <!-- FOTO PRINCIPAL GRANDE -->
+      <div class="mb-12">
+        <p class="text-lg font-semibold text-purple-700 mb-4 text-center">Foto Principal (Obligatoria)</p>
+        <div class="relative max-w-2xl mx-auto">
+          <input type="file" accept="image/*" (change)="onFotoPrincipal($event)" class="hidden" id="fotoPrincipal">
+          <label for="fotoPrincipal" class="block cursor-pointer">
+            <div class="aspect-video bg-gray-100 border-4 border-dashed border-purple-400 rounded-2xl overflow-hidden hover:border-purple-600 transition">
+              <img *ngIf="fotoPrincipal" [src]="fotoPrincipal" class="w-full h-full object-cover">
+              <div *ngIf="!fotoPrincipal" class="flex flex-col items-center justify-center h-96 text-purple-600">
+                <svg class="w-20 h-20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <p class="text-2xl font-bold">Haz clic para subir la foto principal</p>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- GALERÍA DE FOTOS ADICIONALES (DINÁMICA Y HERMOSA) -->
+      <div class="mb-12">
+        <p class="text-lg font-semibold text-purple-700 mb-6 text-center">Fotos adicionales (hasta 5) – opcional pero recomendado</p>
+        
+        <!-- Área para subir más fotos -->
+        <div class="max-w-4xl mx-auto mb-8">
+          <input type="file" accept="image/*" multiple (change)="onFotosAdicionales($event)" class="hidden" id="fotosMultiples">
+          <label for="fotosMultiples" class="flex items-center justify-center gap-4 p-8 bg-gradient-to-r from-purple-50 to-emerald-50 rounded-2xl border-4 border-dashed border-purple-300 hover:border-purple-500 cursor-pointer transition">
+            <svg class="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <div class="text-left">
+              <p class="text-xl font-bold text-purple-800">Haz clic o arrastra aquí</p>
+              <p class="text-gray-600">Puedes subir hasta 5 fotos maximo</p>
+            </div>
+          </label>
+        </div>
+
+        <!-- Vista previa de fotos subidas -->
+        <div *ngIf="fotosAdicionales.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div *ngFor="let foto of fotosAdicionales; let i = index" class="relative group rounded-xl overflow-hidden shadow-lg">
+            <img [src]="foto" class="w-full aspect-video object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition"></div>
+            <button (click)="eliminarFotoAdicional(i)"
+                    class="absolute top-3 right-3 bg-red-600 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold opacity-0 group-hover:opacity-100 transition hover:bg-red-700">
+              ×
+            </button>
+          </div>
+        </div>
+
+        <p *ngIf="fotosAdicionales.length === 0" class="text-center text-gray-500 italic mt-8">
+          Aún no has subido fotos adicionales
+        </p>
+      </div>
+
+      <!-- VIDEO -->
+      <div class="mb-12">
+        <p class="text-lg font-semibold text-purple-700 mb-6 text-center">Video promocional (opcional pero impactante)</p>
+        <div class="max-w-2xl mx-auto">
+          <input type="file" accept="video/*" (change)="onVideo($event)" class="hidden" id="video">
+          <label for="video" class="block cursor-pointer">
+            <div class="aspect-video bg-gray-100 rounded-2xl overflow-hidden border-4 border-dashed border-emerald-400 hover:border-emerald-600 transition">
+              <video *ngIf="videoPreview" [src]="videoPreview" controls class="w-full h-full"></video>
+              <div *ngIf="!videoPreview" class="flex flex-col items-center justify-center h-64 text-emerald-600">
+                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <p class="text-xl font-bold">Sube un video de tu aventura</p>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- RESTO DEL FORMULARIO (más pequeño y limpio) -->
+      <div class="grid md:grid-cols-2 gap-8 mb-10">
+        <!-- Columna izquierda -->
+        <div class="space-y-6">
+          <div><label class="block text-sm font-semibold text-gray-700 mb-2">Título *</label>
+            <input type="text" formControlName="titulo" placeholder="Salar de Uyuni al Amanecer" class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+          </div>
+          <div><label class="block text-sm font-semibold text-gray-700 mb-2">Precio por persona (Bs) *</label>
+            <input type="number" formControlName="precio" placeholder="1450" class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500">
+          </div>
+          <div><label class="block text-sm font-semibold text-gray-700 mb-2">Duración *</label>
+            <input type="text" formControlName="duracion" placeholder="3 días / 2 noches" class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500">
+          </div>
+          <div><label class="block text-sm font-semibold text-gray-700 mb-2">Cupos disponibles *</label>
+            <input type="number" formControlName="cupos" placeholder="12" class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500">
+          </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="space-y-6">
+          <div><label class="block text-sm font-semibold text-gray-700 mb-2">Fechas del tour *</label>
+            <div class="grid grid-cols-2 gap-4">
+              <input type="date" formControlName="fechaInicio" class="px-5 py-3 border border-gray-300 rounded-xl">
+              <input type="date" formControlName="fechaFin" class="px-5 py-3 border border-gray-300 rounded-xl">
+            </div>
+          </div>
+          <div><label class="block text-sm font-semibold text-emerald-700 mb-2">Incluye *</label>
+            <textarea formControlName="incluye" rows="3" placeholder="• Transporte&#10;• Alojamiento..." class="w-full px-5 py-3 border border-emerald-300 rounded-xl focus:border-emerald-600 resize-none"></textarea>
+          </div>
+          <div><label class="block text-sm font-semibold text-red-700 mb-2">No incluye</label>
+            <textarea formControlName="noIncluye" rows="2" placeholder="• Entradas..." class="w-full px-5 py-3 border border-red-300 rounded-xl focus:border-red-600 resize-none"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descripción e Itinerario en ancho completo -->
+      <div class="space-y-6 mb-12">
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Descripción completa *</label>
+          <textarea formControlName="descripcion" rows="5" placeholder="Cuenta tu historia..." class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:border-purple-500 resize-none"></textarea>
+        </div>
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Itinerario día por día *</label>
+          <textarea formControlName="itinerario" rows="6" placeholder="Día 1: ..." class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:border-purple-500 resize-none"></textarea>
+        </div>
+      </div>
+
+      <!-- BOTONES -->
+      <div class="flex justify-center gap-8">
+        <button type="button" (click)="cancelar()" class="px-12 py-4 border-2 border-purple-700 text-purple-700 font-bold rounded-xl hover:bg-purple-50 transition">
+          Cancelar
+        </button>
+        <button type="submit" class="px-16 py-5 bg-gradient-to-r from-purple-600 to-emerald-600 text-white font-black text-xl rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition flex items-center gap-4">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M7 11l5-5m0 0l5 5m-5-5v12"/>
+          </svg>
+          PUBLICAR OFERTA
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

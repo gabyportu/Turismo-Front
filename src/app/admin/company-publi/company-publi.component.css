@@ -1,0 +1,67 @@
+:host {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* FONDO MÁS VERDE/MORADO */
+.bg-gradient-to-br {
+  background: linear-gradient(135deg, #d4f4dd 0%, #e8daff 50%, #d4f4dd 100%) !important;
+}
+
+/* ÍCONOS */
+.material-icons {
+  font-family: 'Material Icons' !important;
+  font-size: 1.25rem;
+}
+
+/* BOTONES ACCIONES */
+.mat-mdc-icon-button {
+  transition: all 0.2s ease;
+}
+.mat-mdc-icon-button:hover {
+  transform: scale(1.1);
+}
+
+/* ICONOS GRANDES Y FUERTES */
+.mat-mdc-icon-button {
+  width: 48px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+}
+
+.material-icons {
+  font-family: 'Material Icons' !important;
+  font-size: 1.5rem !important; /* 24px */
+  font-weight: bold !important;
+}
+
+/* COLORES INTENSOS */
+.text-success { color: #166534 !important; } /* Verde fuerte */
+.text-blue-700 { color: #1e40af !important; }
+.text-red-600 { color: #dc2626 !important; }
+
+/* HOVER CON BRILLO */
+.mat-mdc-icon-button:hover {
+  transform: scale(1.15) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 998;
+}
+
+.modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    max-width: 90%;
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    z-index: 999;
+    box-shadow: 0px 10px 40px rgba(0,0,0,0.25);
+}

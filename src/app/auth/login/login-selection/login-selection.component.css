@@ -1,0 +1,79 @@
+.font-poppins { font-family: 'Poppins', sans-serif !important; }
+
+.text-primary { color: #6a1b9a !important; }
+.text-success { color: #166534 !important; }
+.text-accent { color: #dc2626 !important; }
+
+/* Pestañas */
+.mat-tab-custom .mat-mdc-tab-header {
+  background: transparent !important;
+  border-bottom: none !important;
+  justify-content: center;
+  padding: 0 2rem;
+}
+
+.mat-tab-custom .mat-mdc-tab {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  opacity: 0.8;
+  min-width: 200px;
+}
+
+.mat-tab-custom .mat-mdc-tab-active {
+  opacity: 1;
+  color: #6a1b9a !important;
+  border-bottom: 4px solid #6a1b9a;
+  font-weight: 700 !important;
+}
+
+/* Animación */
+.animate-fadeIn {
+  animation: fadeIn 0.7s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================================== */
+/* ESTILOS DE LOS CAMPOS DE FORMULARIOS */
+/* ===================================== */
+
+.form-field-custom .mat-mdc-form-field-flex {
+  border: 2px solid #d1c4e9 !important; /* MORADO SUAVE */
+  border-radius: 12px !important;
+  padding: 0.6rem 1rem !important;
+  transition: border-color 0.3s ease;
+  background: white !important;
+}
+
+/* Label → espacio perfecto */
+.form-field-custom .mat-mdc-form-field-infix {
+  padding: 1.3rem 0 !important;
+}
+
+/* Íconos */
+.form-field-custom .mat-mdc-form-field-icon-suffix {
+  margin-right: 6px !important;
+  color: #6a1b9a !important;
+  font-size: 26px !important;
+}
+
+/* Foco */
+.form-field-custom .mat-mdc-form-field.mat-focused .mat-mdc-form-field-flex {
+  border-color: #6a1b9a !important;
+  box-shadow: 0 0 8px rgba(106,27,154,0.15);
+}
+
+/* Hover */
+.form-field-custom:hover .mat-mdc-form-field-flex {
+  border-color: #8e24aa !important;
+}
+
+/* Label estilo morado */
+.form-field-custom .mat-mdc-floating-label {
+  font-size: 1.1rem !important;
+  color: #6a1b9a !important;
+  font-weight: 600 !important;
+}

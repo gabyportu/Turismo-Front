@@ -1,0 +1,105 @@
+/* ============================ */
+/*   ESTILO GENERAL DEL STEP    */
+/* ============================ */
+
+.step-container {
+  padding: 20px;
+}
+
+.step-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #5B2E8C;
+  margin-bottom: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+/* ====================================================== */
+/*      BORDE MORADO SIEMPRE (MDC Angular Material 17+)   */
+/* ====================================================== */
+
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: #5B2E8C !important;
+  --mdc-outlined-text-field-hover-outline-color: #5B2E8C !important;
+  --mdc-outlined-text-field-focus-outline-color: #5B2E8C !important;
+  --mdc-outlined-text-field-error-outline-color: #E53935 !important;
+}
+
+/* Grosor y redondeo del borde */
+.mdc-notched-outline__leading,
+.mdc-notched-outline__trailing,
+.mdc-notched-outline__notch {
+  border-width: 2px !important;
+  border-radius: 10px !important;
+}
+
+/* Input padding */
+.mat-mdc-text-field .mdc-text-field__input {
+  padding: 10px !important;
+}
+
+/* ====================================================== */
+/*       BORDE ROJO CUANDO EL CAMPO ES INVALIDO         */
+/* ====================================================== */
+.mat-form-field-invalid .mdc-notched-outline {
+  border-color: #E53935 !important;
+}
+
+/* ====================================================== */
+/*   ÍCONO DEL DATEPICKER MORADO                         */
+/* ====================================================== */
+.mat-datepicker-toggle-default-icon,
+.mat-mdc-datepicker-toggle .mat-mdc-icon-button svg {
+  fill: #5B2E8C !important;
+  color: #5B2E8C !important;
+}
+
+/* ====================================================== */
+/*                  BOTONES                               */
+/* ====================================================== */
+
+.buttons-two {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* BOTÓN PRINCIPAL (Siguiente) */
+.mat-mdc-raised-button {
+  background-color: #5B2E8C !important;
+  color: white !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+}
+
+/* BOTÓN SECUNDARIO (Volver) */
+.mat-mdc-outlined-button {
+  border-color: #5B2E8C !important;
+  color: #5B2E8C !important;
+  border-width: 2px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+  background-color: white !important;
+}
+
+/* HOVER EFECTOS */
+.mat-mdc-raised-button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(91, 46, 140, 0.4);
+}
+
+.mat-mdc-outlined-button:hover {
+  background-color: #f5f0fa !important;
+}

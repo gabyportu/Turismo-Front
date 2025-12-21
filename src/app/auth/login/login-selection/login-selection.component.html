@@ -1,0 +1,152 @@
+<div class="min-h-screen relative overflow-hidden flex items-center justify-center p-4 font-poppins">
+
+  <!-- FONDO BOLIVIANO -->
+  <div class="fixed inset-0 -z-10">
+    <div class="absolute inset-0 bg-gradient-to-br from-white via-purple-50 to-green-50"></div>
+    <svg class="absolute bottom-0 w-full h-80" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path fill="#065f46" opacity="0.6" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,133.3C672,117,768,139,864,170.7C960,203,1056,245,1152,245.3C1248,245,1344,203,1392,181.3L1440,160L1440,320L0,320Z"></path>
+      <path fill="#064e3b" opacity="0.8" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,197.3C672,192,768,160,864,160C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L0,320Z"></path>
+      <path fill="#86efac" opacity="0.5" d="M0,288L48,272C96,256,192,224,288,224C384,224,480,256,576,256C672,256,768,224,864,224C960,256,1056,320,1152,320C1248,320,1344,256,1392,224L1440,192L1440,320L0,320Z"></path>
+    </svg>
+    <div class="absolute top-12 right-20 w-32 h-32 bg-yellow-200 rounded-full opacity-60 blur-md"></div>
+    <div class="absolute top-16 right-24 w-24 h-24 bg-yellow-100 rounded-full"></div>
+  </div>
+
+  <!-- TARJETA PRINCIPAL -->
+  <div class="relative z-10 w-full max-w-4xl mx-auto">
+    <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-3xl overflow-hidden border border-white/50">
+
+      <!-- BARRA BANDERA -->
+      <div class="h-3 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
+
+      <!-- TÍTULO -->
+      <div class="p-10 text-center">
+        <h1 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-emerald-600 drop-shadow-lg">
+          Susurros de Bolivia
+        </h1>
+        <p class="text-lg md:text-xl font-medium text-gray-700 mt-3">Descubre la magia de nuestra tierra</p>
+      </div>
+
+      <!-- PESTAÑAS -->
+      <div class="flex justify-center border-b-2 border-gray-200">
+        <button (click)="tab = 'login'"
+                class="px-12 md:px-16 py-4 text-lg md:text-xl font-bold transition"
+                [class.bg-purple-600]="tab === 'login'"
+                [class.text-white]="tab === 'login'"
+                [class.text-gray-700]="tab !== 'login'"
+                [class.hover:bg-purple-50]="tab !== 'login'">
+          Iniciar Sesión
+        </button>
+        <button (click)="tab = 'admin'"
+                class="px-12 md:px-16 py-4 text-lg md:text-xl font-bold transition"
+                [class.bg-red-600]="tab === 'admin'"
+                [class.text-white]="tab === 'admin'"
+                [class.text-gray-700]="tab !== 'admin'"
+                [class.hover:bg-red-50]="tab !== 'admin'">
+          Administrador
+        </button>
+      </div>
+
+      <!-- LOGIN NORMAL -->
+      <div *ngIf="tab === 'login'" class="p-8 md:p-12">
+
+        <!-- SELECCIÓN DE ROL -->
+        <div class="grid md:grid-cols-2 gap-8 mb-12">
+          <div class="group cursor-pointer rounded-3xl overflow-hidden shadow-2xl transition-all hover:-translate-y-4"
+               [class.ring-4]="selected === 'company'" [class.ring-purple-600]="selected === 'company'"
+               (click)="selectRole('company')">
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-10 text-center group-hover:scale-105 transition-all">
+              <div class="text-6xl mb-4 group-hover:animate-pulse">Empresa</div>
+              <h3 class="text-3xl font-black text-purple-700 mb-3">Gestión Turística</h3>
+              <p class="text-base text-gray-700">Administra tus paquetes y servicios</p>
+            </div>
+          </div>
+
+          <div class="group cursor-pointer rounded-3xl overflow-hidden shadow-2xl transition-all hover:-translate-y-4"
+               [class.ring-4]="selected === 'tourist'" [class.ring-emerald-600]="selected === 'tourist'"
+               (click)="selectRole('tourist')">
+            <div class="bg-gradient-to-br from-emerald-50 to-green-100 p-10 text-center group-hover:scale-105 transition-all">
+              <div class="text-6xl mb-4 group-hover:animate-pulse">Turista</div>
+              <h3 class="text-3xl font-black text-emerald-700 mb-3">Aventura</h3>
+              <p class="text-base text-gray-700">Explora los destinos más increíbles</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORMULARIO -->
+        <div *ngIf="selected" class="max-w-xl mx-auto bg-gradient-to-br rounded-3xl p-10 shadow-2xl"
+             [class.from-purple-50]="selected === 'company'"
+             [class.to-purple-100]="selected === 'company'"
+             [class.from-emerald-50]="selected === 'tourist'"
+             [class.to-green-100]="selected === 'tourist'">
+
+          <h2 class="text-3xl font-black text-center mb-8"
+              [class.text-purple-700]="selected === 'company'"
+              [class.text-emerald-700]="selected === 'tourist'">
+            {{ selected === 'company' ? 'Ingreso Empresa' : 'Ingreso Turista' }}
+          </h2>
+
+          <div class="space-y-6">
+            <div class="relative">
+              <input type="email" placeholder="Email" class="w-full px-14 py-4 text-base rounded-2xl border-2 border-purple-200 focus:border-purple-600 outline-none">
+              <svg class="w-6 h-6 absolute left-4 top-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+
+            <div class="relative">
+              <input type="password" placeholder="Contraseña" class="w-full px-14 py-4 text-base rounded-2xl border-2 border-purple-200 focus:border-purple-600 outline-none">
+              <svg class="w-6 h-6 absolute left-4 top-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 1.657-1.343 3-3 3s-3-1.343-3-3 3-3 3-3m3 9h6m-9-9v6m9-6v6m-9 6h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+              <button type="button" (click)="selected === 'tourist' ? loginTourist() : loginCompany()"
+                      class="flex-1 py-4 text-lg font-bold text-white rounded-2xl shadow-lg hover:scale-105 transition"
+                      [class.bg-gradient-to-r]="true"
+                      [class.from-purple-600]="selected === 'company'"
+                      [class.to-purple-800]="selected === 'company'"
+                      [class.from-emerald-600]="selected === 'tourist'"
+                      [class.to-emerald-800]="selected === 'tourist'">
+                INGRESAR
+              </button>
+              <button type="button" (click)="goToRegister()"
+                      class="flex-1 py-4 text-lg font-bold border-2 border-purple-600 text-purple-700 rounded-2xl hover:bg-purple-50 transition">
+                REGISTRARSE
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANTALLA ADMIN -->
+      <div *ngIf="tab === 'admin'" class="p-12 md:p-16 text-center">
+        <h2 class="text-4xl md:text-5xl font-black text-red-600 mb-12">Panel de Administración</h2>
+        <div class="max-w-md mx-auto space-y-8">
+          <div class="relative">
+            <input type="text" placeholder="Usuario" class="w-full px-14 py-5 text-lg rounded-2xl border-2 border-red-300 focus:border-red-600 outline-none">
+            <svg class="w-8 h-8 absolute left-5 top-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </div>
+          <div class="relative">
+            <input type="password" placeholder="Contraseña" class="w-full px-14 py-5 text-lg rounded-2xl border-2 border-red-300 focus:border-red-600 outline-none">
+            <svg class="w-8 h-8 absolute left-5 top-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 1.657-1.343 3-3 3s-3-1.343-3-3 3-3 3-3m3 9h6m-9-9v6m9-6v6m-9 6h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <button (click)="loginAdmin()"
+                  class="w-full py-5 bg-gradient-to-r from-red-600 to-red-800 text-white text-xl font-bold rounded-2xl shadow-lg hover:scale-105 transition">
+            ACCEDER AL SISTEMA
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-12 text-white">
+      <p class="text-3xl md:text-4xl font-bold drop-shadow-2xl">Bolivia te espera</p>
+      <p class="text-base md:text-lg opacity-90 mt-2">Hecho con amor en el corazón de Sudamérica</p>
+    </div>
+  </div>
+</div>
