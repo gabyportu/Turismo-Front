@@ -37,6 +37,33 @@
           Registro de Empresa
         </h1>
         <p class="text-2xl font-medium text-gray-700 mt-4">Completa los datos para formar parte de Susurros de Bolivia</p>
+        <div class="mt-6 flex justify-center">
+          <button type="button" routerLink="/login"
+                  class="px-10 py-3 border-2 border-purple-600 text-purple-700 text-lg font-bold rounded-full hover:bg-purple-50 transition">
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      <div class="px-10">
+        <div *ngIf="successMessage" class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/90 p-5 text-emerald-800 shadow-sm">
+          <div class="flex items-start gap-4">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-200 text-emerald-700 font-black">OK</div>
+            <div>
+              <p class="text-lg font-extrabold">Empresa registrada</p>
+              <p class="text-sm md:text-base text-emerald-700">{{ successMessage }}</p>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="errorMessage" class="mb-6 rounded-2xl border border-red-200 bg-red-50/90 p-5 text-red-800 shadow-sm">
+          <div class="flex items-start gap-4">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-200 text-red-700 font-black">!</div>
+            <div>
+              <p class="text-lg font-extrabold">Revisa los datos</p>
+              <p class="text-sm md:text-base text-red-700">{{ errorMessage }}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ====================== -->
@@ -59,7 +86,7 @@
         <div class="step-pill"
           [class.active]="currentStep === 3"
           (click)="goToStep(3)">
-          3. Confirmación
+          3. Documentos
         </div>
 
       </div>
@@ -71,18 +98,19 @@
 
         <app-step1-company
           *ngIf="currentStep === 1"
-          (next)="nextStep()">
+          (next)="onStep1Next($event)">
         </app-step1-company>
 
         <app-step2-company
           *ngIf="currentStep === 2"
-          (next)="nextStep()"
+          (next)="onStep2Next($event)"
           (back)="prevStep()">
         </app-step2-company>
 
         <app-step3-company
           *ngIf="currentStep === 3"
-          (back)="prevStep()">
+          (back)="prevStep()"
+          (finish)="onFinish($event)">
         </app-step3-company>
 
       </div>

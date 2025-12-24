@@ -7,30 +7,49 @@
       <label class="block text-base font-bold text-purple-700 mb-2">Nombre de la Empresa *</label>
       <input type="text" formControlName="nombre" placeholder="Ej: Kanoo Tours"
              class="w-full px-5 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-600 outline-none text-base transition">
+      <div *ngIf="(form.get('nombre')?.touched || submitted) && form.get('nombre')?.invalid" class="mt-2 text-sm text-red-600">
+        <span *ngIf="form.get('nombre')?.hasError('required')">Campo obligatorio.</span>
+        <span *ngIf="form.get('nombre')?.hasError('minlength')">Minimo 3 caracteres.</span>
+      </div>
     </div>
 
     <div>
       <label class="block text-base font-bold text-purple-700 mb-2">NIT *</label>
       <input type="text" formControlName="nit" placeholder="123456789"
              class="w-full px-5 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-600 outline-none text-base transition">
+      <div *ngIf="(form.get('nit')?.touched || submitted) && form.get('nit')?.hasError('required')" class="mt-2 text-sm text-red-600">
+        Campo obligatorio.
+      </div>
     </div>
 
     <div>
-      <label class="block text-base font-bold text-purple-700 mb-2">Ciudad *</label>
-      <input type="text" formControlName="ciudad" placeholder="La Paz, Santa Cruz..."
+      <label class="block text-base font-bold text-purple-700 mb-2">Ciudad</label>
+      <select formControlName="idCiudad"
+              class="w-full px-5 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-600 outline-none text-base transition">
+        <option value="">Selecciona una opcion</option>
+        <option *ngFor="let city of cities" [value]="city.id">{{ city.name }}</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-base font-bold text-purple-700 mb-2">Facebook</label>
+      <input type="url" formControlName="facebook" placeholder="https://facebook.com/tuempresa"
              class="w-full px-5 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-600 outline-none text-base transition">
     </div>
 
     <div>
-      <label class="block text-base font-bold text-purple-700 mb-2">Teléfono / WhatsApp *</label>
-      <input type="text" formControlName="telefono" placeholder="+591 71234567"
+      <label class="block text-base font-bold text-purple-700 mb-2">Instagram</label>
+      <input type="url" formControlName="instagram" placeholder="https://instagram.com/tuempresa"
              class="w-full px-5 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-600 outline-none text-base transition">
     </div>
 
     <div class="md:col-span-2">
-      <label class="block text-base font-bold text-purple-700 mb-2">Descripción de la empresa *</label>
-      <textarea formControlName="descripcion" rows="4" placeholder="Cuéntanos sobre tu empresa..."
+      <label class="block text-base font-bold text-purple-700 mb-2">Descripcion de la empresa *</label>
+      <textarea formControlName="descripcion" rows="4" placeholder="Cuentanos sobre tu empresa..."
                 class="w-full px-5 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-600 outline-none text-base resize-none transition"></textarea>
+      <div *ngIf="(form.get('descripcion')?.touched || submitted) && form.get('descripcion')?.hasError('required')" class="mt-2 text-sm text-red-600">
+        Campo obligatorio.
+      </div>
     </div>
   </form>
 
@@ -41,13 +60,20 @@
             class="px-10 py-4 bg-gradient-to-r from-purple-600 to-purple-800 text-white text-lg font-bold rounded-full shadow-lg hover:scale-105 transition flex items-center gap-3 mx-auto">
       Subir Logo
     </button>
-    <div *ngIf="logo" class="mt-4 inline-block">
-      <img [src]="logo" alt="Logo" class="w-24 h-24 rounded-full border-4 border-purple-300 object-cover shadow-lg">
+    <div *ngIf="(form.get('logo')?.touched || submitted) && form.get('logo')?.hasError('required')" class="mt-3 text-sm text-red-600">
+      El logo es obligatorio.
+    </div>
+    <div *ngIf="logoPreview" class="mt-4 inline-block">
+      <img [src]="logoPreview" alt="Logo" class="w-24 h-24 rounded-full border-4 border-purple-300 object-cover shadow-lg">
     </div>
   </div>
 
-  <div class="text-right mt-10">
-    <button (click)="onNext()" [disabled]="form.invalid"
+  <div class="mt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+    <button type="button" routerLink="/login"
+            class="px-12 py-4 border-2 border-purple-600 text-purple-700 text-xl font-bold rounded-full hover:bg-purple-50 transition">
+      Cancelar
+    </button>
+    <button type="button" (click)="onNext()"
             class="px-12 py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-xl font-bold rounded-full shadow-lg hover:scale-105 transition">
       Siguiente
     </button>
