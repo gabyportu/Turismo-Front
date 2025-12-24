@@ -1,0 +1,47 @@
+{
+  "/auth/login": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/empresa/registrar": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/empresa/pendientes": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/empresa/detalle": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/admin/empresa/aprobar": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/admin/empresa/rechazar": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/oferta/pendientes": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/oferta/detalle": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/turista/registrar": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

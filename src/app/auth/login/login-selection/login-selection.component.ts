@@ -53,7 +53,7 @@ export class LoginSelectionComponent {
   selected: 'company' | 'tourist' | null = null;
   tab: 'login' | 'admin' = 'login';
 
-  private readonly loginUrl = 'http://localhost:8112/auth/login';
+  private readonly loginUrl = '/auth/login';
 
   constructor(private router: Router, private http: HttpClient) {}
 

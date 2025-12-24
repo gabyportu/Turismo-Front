@@ -128,7 +128,7 @@ export class RegisterCompanyComponent {
       formData.append('documentos', file);
     });
 
-    this.http.post('http://localhost:8112/empresa/registrar', formData).subscribe({
+    this.http.post('/empresa/registrar', formData).subscribe({
       next: () => {
         this.errorMessage = '';
         this.successMessage = 'Tu empresa fue registrada con exito. Te enviaremos la confirmacion al correo.';

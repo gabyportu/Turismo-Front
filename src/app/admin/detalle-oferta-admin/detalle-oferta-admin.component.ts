@@ -2,24 +2,34 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 
-interface OfertaPendiente {
-  id: number;
-  companyId: number;
+interface OfertaDetalle {
+  idOferta: number;
+  idEmpresa: number;
   titulo: string;
-  descripcion: string
+  descripcion: string;
   precio: number;
-  duracion: string;
-  incluye: string;
-  noIncluye: string;
-  itinerario: string;
-  cupos: number;
   fechaInicio: string;
   fechaFin: string;
-  fotoPrincipal: string;
-  fotosAdicionales: string[];
-  videoPreview: string | null;
-  empresaNombre: string;
+  detalles: string;
+  estado: string;
+  fechaCreacion: string;
+  status: boolean;
+}
+
+interface MultimediaOferta {
+  idMultimediaOferta: number;
+  objectName: string;
+  url: string;
+  status: boolean;
+}
+
+interface OfertaDetalleResponse {
+  oferta: OfertaDetalle;
+  destinos: number[];
+  actividades: number[];
+  multimedia: MultimediaOferta[];
 }
 
 @Component({
@@ -29,66 +39,78 @@ interface OfertaPendiente {
     CommonModule,
     RouterModule,
     MatIconModule,
+    HttpClientModule
   ],
   templateUrl: './detalle-oferta-admin.component.html',
   styleUrl: './detalle-oferta-admin.component.css'
 })
-export class DetalleOfertaAdminComponent {
+export class DetalleOfertaAdminComponent implements OnInit {
+  ofertaId: number | null = null;
+  oferta: OfertaDetalle | null = null;
+  destinos: number[] = [];
+  actividades: number[] = [];
+  multimedia: MultimediaOferta[] = [];
+  mainImageUrl: string | null = null;
+  galleryUrls: string[] = [];
+  estadoLabel = 'Pendiente';
+  estadoTone: 'pending' | 'approved' | 'rejected' = 'pending';
+  loading = false;
+  errorMessage = '';
 
-  ofertaId!: number;
-  oferta!: OfertaPendiente;
+  private readonly detalleUrl = '/oferta/detalle';
 
-  private mockData: OfertaPendiente[] = [
-    {
-      id: 1,
-      companyId: 1,
-      titulo: "Salar de Uyuni 3D/2N - Espejo del Cielo",
-      descripcion: "La experiencia más surrealista del mundo. Camina sobre el cielo reflejado, duerme en un hotel hecho 100% de sal y vive atardeceres que parecen de otro planeta.",
-      precio: 1450,
-      duracion: "3 días / 2 noches",
-      incluye: "• Transporte 4x4 privado\n• Alojamiento en hotel de sal\n• Todas las comidas\n• Guía certificado",
-      noIncluye: "• Entrada al parque (50 Bs)\n• Seguro médico",
-      itinerario: "Día 1: Llegada a Uyuni y traslado al hotel de sal\nDía 2: Amanecer en el salar + Isla Incahuasi\nDía 3: Cementerio de trenes y retorno",
-      cupos: 12,
-      fechaInicio: "2025-02-10",
-      fechaFin: "2025-02-12",
-      fotoPrincipal: "https://images.unsplash.com/photo-1590524862241-1e90a250a5e8?w=1200",
-      fotosAdicionales: [
-        "https://images.unsplash.com/photo-1580130662265-337c7e0bc70e?w=800",
-        "https://images.unsplash.com/photo-1559523195-5b0a4e8e6a0e?w=800",
-        "https://images.unsplash.com/photo-1506905925346-5005b2d80e3d?w=800"
-      ],
-      videoPreview: null,
-      empresaNombre: "Kanoo Tours"
-    },
-    {
-      id: 102,
-      companyId: 1,
-      titulo: "Death Road en Bicicleta",
-      descripcion: "64km de pura adrenalina desde La Cumbre hasta Coroico.",
-      precio: 890,
-      duracion: "1 día",
-      incluye: "• Bicicleta full suspensión\n• Guía\n• Almuerzo",
-      noIncluye: "",
-      itinerario: "Salida 7am desde La Paz\nLlegada a Coroico 5pm",
-      cupos: 15,
-      fechaInicio: "2025-01-20",
-      fechaFin: "2025-01-20",
-      fotoPrincipal: "https://images.unsplash.com/photo-1506905925346-5005b2d80e3d?w=1200",
-      fotosAdicionales: [],
-      videoPreview: null,
-      empresaNombre: "Kanoo Tours"
-    }
-  ];
-
-  constructor(private route: ActivatedRoute){}
+  constructor(private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.ofertaId = Number(this.route.snapshot.paramMap.get('id'));
-    this.oferta = this.mockData.find(o => o.id === this.ofertaId)!;
-
-    if(!this.oferta){
-      console.error('Oferta no encontrada con ID:', this.ofertaId);
+    const id = this.route.snapshot.paramMap.get('id');
+    this.ofertaId = id ? Number(id) : null;
+    if (this.ofertaId == null || Number.isNaN(this.ofertaId)) {
+      this.errorMessage = 'No se encontro el identificador de la oferta.';
+      return;
     }
+
+    this.cargarDetalle(this.ofertaId);
+  }
+
+  cargarDetalle(idOferta: number) {
+    this.loading = true;
+    this.errorMessage = '';
+    const token = localStorage.getItem('token');
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    this.http.get<OfertaDetalleResponse>(`${this.detalleUrl}/${idOferta}`, { headers }).subscribe({
+      next: (response) => {
+        this.oferta = response.oferta ?? null;
+        this.destinos = response.destinos ?? [];
+        this.actividades = response.actividades ?? [];
+        this.multimedia = response.multimedia ?? [];
+        this.mainImageUrl = this.multimedia[0]?.url ?? null;
+        this.galleryUrls = this.multimedia.slice(1).map((item) => item.url);
+        this.setEstado(this.oferta?.estado);
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage = 'No se pudo cargar el detalle de la oferta.';
+        this.loading = false;
+      }
+    });
+  }
+
+  private setEstado(estado?: string | null) {
+    const value = (estado ?? '').toLowerCase();
+    if (value.startsWith('apro')) {
+      this.estadoLabel = 'Aprobado';
+      this.estadoTone = 'approved';
+      return;
+    }
+    if (value.startsWith('rech')) {
+      this.estadoLabel = 'Rechazado';
+      this.estadoTone = 'rejected';
+      return;
+    }
+    this.estadoLabel = 'Pendiente';
+    this.estadoTone = 'pending';
   }
 }

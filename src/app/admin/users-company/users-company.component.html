@@ -73,6 +73,34 @@
           </button>
         </div>
 
+        <div *ngIf="actionMessage" class="mb-4 rounded-2xl border p-4 text-sm shadow-sm"
+             [ngClass]="actionType === 'success'
+               ? 'border-emerald-200 bg-emerald-50/90 text-emerald-800'
+               : 'border-red-200 bg-red-50/90 text-red-800'">
+          <div class="flex items-start gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full font-black"
+                 [ngClass]="actionType === 'success'
+                   ? 'bg-emerald-200 text-emerald-700'
+                   : 'bg-red-200 text-red-700'">
+              {{ actionType === 'success' ? 'OK' : '!' }}
+            </div>
+            <div>
+              <p class="text-base font-extrabold">
+                {{ actionType === 'success' ? 'Estado actualizado' : 'No se pudo actualizar' }}
+              </p>
+              <p class="text-sm" [ngClass]="actionType === 'success' ? 'text-emerald-700' : 'text-red-700'">
+                {{ actionMessage }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="loading" class="mb-4 rounded-xl border border-purple-100 bg-purple-50 px-4 py-3 text-purple-700 text-sm">
+          Cargando empresas pendientes...
+        </div>
+        <div *ngIf="errorMessage" class="mb-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-red-700 text-sm">
+          {{ errorMessage }}
+        </div>
+
         <!-- TABLA COMPACTA Y ELEGANTE -->
         <div class="overflow-x-auto rounded-xl border border-gray-200">
           <table class="w-full text-sm">
@@ -153,4 +181,38 @@
   </div>
 
   <app-new-company *ngIf="showNewCompanyModal" (close)="closeModal()"></app-new-company>
+
+  <!-- CONFIRMACION -->
+  <div *ngIf="confirmOpen" class="fixed inset-0 z-50 flex items-center justify-center p-6">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="confirmCancelar()"></div>
+    <div class="relative w-full max-w-lg rounded-3xl bg-white shadow-3xl border border-white/60 overflow-hidden">
+      <div class="h-2 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
+      <div class="p-8 text-center">
+        <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
+             [ngClass]="confirmAction === 'aprobar' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
+          <span class="material-icons text-4xl">
+            {{ confirmAction === 'aprobar' ? 'check_circle' : 'cancel' }}
+          </span>
+        </div>
+        <h3 class="text-2xl font-black text-purple-800">Confirmar accion</h3>
+        <p class="mt-3 text-gray-700">
+          ¿Deseas {{ confirmAction === 'aprobar' ? 'aprobar' : 'rechazar' }} la empresa
+          <span class="font-bold text-purple-700">{{ confirmEmpresa?.nombre }}</span>?
+        </p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center px-8 pb-8">
+        <button type="button" (click)="confirmCancelar()"
+                class="px-8 py-3 border-2 border-purple-600 text-purple-700 text-lg font-bold rounded-full hover:bg-purple-50 transition">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmAceptar()"
+                class="px-8 py-3 text-white text-lg font-bold rounded-full shadow-lg transition"
+                [ngClass]="confirmAction === 'aprobar'
+                  ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 hover:scale-105'
+                  : 'bg-gradient-to-r from-red-600 to-red-700 hover:scale-105'">
+          Si, continuar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

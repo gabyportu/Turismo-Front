@@ -98,7 +98,7 @@ export class RegisterTouristComponent {
       password: formValue.password
     };
 
-    this.http.post('http://localhost:8112/turista/registrar', payload).subscribe({
+    this.http.post('/turista/registrar', payload).subscribe({
       next: () => {
         this.successMessage = 'Bienvenido a la aventura boliviana. Te llevaremos al login en un momento.';
         this.errorMessage = '';
