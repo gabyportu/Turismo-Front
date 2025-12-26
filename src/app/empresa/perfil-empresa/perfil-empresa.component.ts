@@ -1,31 +1,62 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-interface Servicio{
-  id: number;
-  titulo: string;
-  precio: number;
-  duracion: string;
-  imagen: string;
-  calificacion: number;
-  resenas: number;
+interface EmpresaDetalle {
+  idEmpresa: number;
+  idCiudad: number;
+  nombre: string;
+  nit: string;
+  descripcion: string;
+  facebook?: string | null;
+  instagram?: string | null;
+  logoURL?: string | null;
+  estado?: string | null;
+  status?: boolean | null;
 }
 
-interface Empresa{
-  id: number;
-  nombre: string;
-  logo: string;
-  banner: string;
+interface RepresentanteDetalle {
+  idRepresentante?: number | null;
+  idUsuario?: number | null;
+  idEmpresa?: number | null;
+  numeroDocumento: string;
+  extension: string;
+  status?: boolean | null;
+}
+
+interface UsuarioDetalle {
+  idUsuario: number;
+  nombres: string;
+  apellidoPaterno?: string | null;
+  apellidoMaterno?: string | null;
+  fechaNacimiento?: string | null;
+  genero?: string | null;
+  telefono?: string | null;
+}
+
+interface EmpresaDetalleResponse {
+  empresa: EmpresaDetalle;
+  representante: RepresentanteDetalle;
+  usuario?: UsuarioDetalle | null;
+  logoUrl?: string | null;
+}
+
+interface ImagenPrincipal {
+  idMultimediaOferta: number;
+  objectName: string;
+  url: string;
+  status: boolean;
+}
+
+interface OfertaEmpresa {
+  idOferta: number;
+  titulo: string;
   descripcion: string;
-  whatsapp: string;
-  facebook: string;
-  instagram: string;
-  calificacion: number;
-  totalResenas: number;
-  desde: string;
-  servicios: Servicio[];
+  precio: number;
+  estado: string;
+  imagenPrincipal?: ImagenPrincipal | null;
 }
 
 @Component({
@@ -35,74 +66,161 @@ interface Empresa{
     CommonModule,
     RouterModule,
     MatIconModule,
+    HttpClientModule
   ],
   templateUrl: './perfil-empresa.component.html',
   styleUrl: './perfil-empresa.component.css'
 })
-export class PerfilEmpresaComponent implements OnInit{
-  empresa!: Empresa;
-  empresaId: number = 1;
+export class PerfilEmpresaComponent implements OnInit {
+  empresaId: number | null = null;
+  empresa: EmpresaDetalle | null = null;
+  representante: RepresentanteDetalle | null = null;
+  usuario: UsuarioDetalle | null = null;
+  logoUrl: string | null = null;
+  ofertas: OfertaEmpresa[] = [];
+  loadingEmpresa = false;
+  loadingOfertas = false;
+  errorMessage = '';
+  ofertasError = '';
+
+  private readonly detalleUrl = '/empresa/detalle';
+  private readonly ofertasUrl = '/oferta/empresa/listado-apro-pend';
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id')) || 1;
-    this.empresa = this.getEmpresaPorId(id);
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const id = idParam ? Number(idParam) : null;
+    if (id == null || Number.isNaN(id)) {
+      this.errorMessage = 'No se encontro el identificador de la empresa.';
+      return;
+    }
+    this.empresaId = id;
+    this.cargarEmpresa(id);
+    this.cargarOfertas(id);
   }
 
-  getEstrellasLlenas(calificacion: number): number{
-    return Math.floor(calificacion);
+  crearNuevaOferta() {
+    this.router.navigate(['crear-oferta']);
   }
 
-  tieneMediaEstrella(calificacion: number): boolean{
-    return calificacion % 1 >= 0.5;
+  editarPerfil() {
+    if (this.empresaId != null) {
+      this.router.navigate(['/empresa/perfil', this.empresaId], { queryParams: { editar: true } });
+    }
   }
 
-  private getEmpresaPorId(id: number): Empresa {
-    const empresas: { [key: number]: Empresa } = {
-      1: {
-        id: 1,
-        nombre: "Kanoo Tours",
-        logo: "https://images.unsplash.com/photo-1560472355-5364e9e7c2b8?w=600",
-        banner: "https://images.unsplash.com/photo-1590524862241-1e90a250a5e8?w=1600",
-        descripcion: "Los pioneros del Salar de Uyuni desde 2010. Tours 4x4 premium, hoteles de sal y experiencias únicas bajo las estrellas.",
-        whatsapp: "+59171234567",
-        facebook: "kanootours",
-        instagram: "kanootours_bolivia",
-        calificacion: 4.97,
-        totalResenas: 342,
-        desde: "2010",
-        servicios: [
-          { id: 1, titulo: "Salar de Uyuni 3D/2N – Espejo del Cielo", precio: 1450, duracion: "3 días", imagen: "https://images.unsplash.com/photo-1590524862241-1e90a250a5e8?w=800", calificacion: 4.97, resenas: 342 },
-          { id: 7, titulo: "Salar + Laguna Colorada 4D/3N", precio: 2150, duracion: "4 días", imagen: "https://images.unsplash.com/photo-1583417319070-4e4d9e5d7f1f?w=800", calificacion: 4.95, resenas: 189 },
-          { id: 8, titulo: "Tour Astronómico Nocturno", precio: 980, duracion: "1 noche", imagen: "https://images.unsplash.com/photo-1506905925346-5005b2d80e3d?w=800", calificacion: 5.0, resenas: 98 }
-        ]
-      },
-      2: {
-        id: 2,
-        nombre: "Gravity Bolivia",
-        logo: "https://images.unsplash.com/photo-1581093458791-9ea2b0675f37?w=600",
-        banner: "https://images.unsplash.com/photo-1506905925346-5005b2d80e3d?w=1600",
-        descripcion: "Los reyes de la Death Road desde 1998. Bicicletas full suspensión, guías certificados y adrenalina garantizada.",
-        whatsapp: "+59176543210",
-        facebook: "gravitybolivia",
-        instagram: "gravitybolivia",
-        calificacion: 4.95,
-        totalResenas: 567,
-        desde: "1998",
-        servicios: [
-          { id: 9, titulo: "Death Road Full Day", precio: 890, duracion: "1 día", imagen: "https://images.unsplash.com/photo-1506905925346-5005b2d80e3d?w=800", calificacion: 4.95, resenas: 567 }
-        ]
+  getCiudadNombre(idCiudad?: number | null): string {
+    if (idCiudad == null) {
+      return 'Sin ciudad';
+    }
+    const ciudades = new Map<number, string>([
+      [1, 'La Paz'],
+      [2, 'El Alto'],
+      [3, 'Cochabamba'],
+      [4, 'Quillacollo'],
+      [5, 'Santa Cruz de la Sierra'],
+      [6, 'Montero'],
+      [7, 'Oruro'],
+      [8, 'Potosi'],
+      [9, 'Uyuni'],
+      [10, 'Sucre'],
+      [11, 'Tarija'],
+      [12, 'Trinidad'],
+      [13, 'Cobija']
+    ]);
+    return ciudades.get(idCiudad) ?? 'Sin ciudad';
+  }
+
+  getEstadoLabel(estado?: string | null): string {
+    const value = (estado ?? '').toLowerCase();
+    if (value.startsWith('apro')) {
+      return 'Aprobado';
+    }
+    if (value.startsWith('rech')) {
+      return 'Rechazado';
+    }
+    return 'Pendiente';
+  }
+
+  getEstadoClase(estado?: string | null): string {
+    const value = (estado ?? '').toLowerCase();
+    if (value.startsWith('apro')) {
+      return 'bg-emerald-100 text-emerald-700';
+    }
+    if (value.startsWith('rech')) {
+      return 'bg-red-100 text-red-700';
+    }
+    return 'bg-yellow-100 text-yellow-800';
+  }
+
+  formatFecha(fecha?: string | null): string {
+    if (!fecha) {
+      return 'Sin fecha';
+    }
+    const clean = fecha.split('T')[0];
+    const parts = clean.split('-');
+    if (parts.length === 3) {
+      const [year, month, day] = parts;
+      if (year && month && day) {
+        return `${month}/${day}/${year}`;
       }
-    };
-    return empresas[id] || empresas[1];
+    }
+    const date = new Date(fecha);
+    if (Number.isNaN(date.getTime())) {
+      return fecha;
+    }
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${mm}/${dd}/${date.getFullYear()}`;
   }
 
-  crearNuevaOferta(){
-    this.router.navigate(['crear-oferta'])
+  private cargarEmpresa(idEmpresa: number) {
+    this.loadingEmpresa = true;
+    this.errorMessage = '';
+    const token = localStorage.getItem('token');
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    this.http.get<EmpresaDetalleResponse>(`${this.detalleUrl}/${idEmpresa}`, { headers }).subscribe({
+      next: (response) => {
+        this.empresa = response.empresa ?? null;
+        this.representante = response.representante ?? null;
+        this.usuario = response.usuario ?? null;
+        this.logoUrl = response.logoUrl ?? null;
+        this.loadingEmpresa = false;
+      },
+      error: () => {
+        this.errorMessage = 'No se pudo cargar el perfil de la empresa.';
+        this.loadingEmpresa = false;
+      }
+    });
+  }
+
+  private cargarOfertas(idEmpresa: number) {
+    this.loadingOfertas = true;
+    this.ofertasError = '';
+    const token = localStorage.getItem('token');
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    this.http.get<OfertaEmpresa[]>(`${this.ofertasUrl}/${idEmpresa}`, { headers }).subscribe({
+      next: (response) => {
+        this.ofertas = Array.isArray(response) ? response : [];
+        this.loadingOfertas = false;
+      },
+      error: () => {
+        this.ofertas = [];
+        this.ofertasError = 'No se pudo cargar las ofertas de la empresa.';
+        this.loadingOfertas = false;
+      }
+    });
   }
 
 }

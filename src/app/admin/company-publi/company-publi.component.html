@@ -49,15 +49,7 @@
       <div class="bg-white rounded-2xl shadow-xl p-6">
 
         <!-- FILTROS COMPACTOS (como en empresas) -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-          <select [(ngModel)]="estadoFiltro" (change)="applyFilters()"
-                  class="px-4 py-3 rounded-xl border border-purple-200 focus:border-purple-600 outline-none text-sm">
-            <option value="">Estado</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="aprobada">Aprobada</option>
-            <option value="rechazada">Rechazada</option>
-          </select>
-
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 mb-6">
           <input type="date" [(ngModel)]="fechaInicio" (change)="applyFilters()"
                  class="px-4 py-3 rounded-xl border border-purple-200 focus:border-purple-600 outline-none text-sm">
 

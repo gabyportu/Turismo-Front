@@ -47,6 +47,14 @@ export const routes: Routes = [
         loadComponent: () => import('./empresa/nueva-oferta/nueva-oferta.component')
             .then(m => m.NuevaOfertaComponent)
     },
+    {path: 'empresa/oferta/:id',
+        loadComponent: () => import('./empresa/detalle-oferta/detalle-oferta.component')
+            .then(m => m.DetalleOfertaComponent)
+    },
+    {path: 'empresa/editar-oferta/:id',
+        loadComponent: () => import('./empresa/editar-oferta/editar-oferta.component')
+            .then(m => m.EditarOfertaComponent)
+    },
     {path: 'admin/empresa/:id',
         loadComponent: () => import('./admin/detalle-oferta-admin/detalle-oferta-admin.component')
             .then(m => m.DetalleOfertaAdminComponent)

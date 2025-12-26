@@ -25,10 +25,15 @@ interface MultimediaOferta {
   status: boolean;
 }
 
+interface CatalogoItem {
+  id: number;
+  nombre: string;
+}
+
 interface OfertaDetalleResponse {
   oferta: OfertaDetalle;
-  destinos: number[];
-  actividades: number[];
+  destinos: unknown[];
+  actividades: unknown[];
   multimedia: MultimediaOferta[];
 }
 
@@ -47,8 +52,8 @@ interface OfertaDetalleResponse {
 export class DetalleOfertaAdminComponent implements OnInit {
   ofertaId: number | null = null;
   oferta: OfertaDetalle | null = null;
-  destinos: number[] = [];
-  actividades: number[] = [];
+  destinos: CatalogoItem[] = [];
+  actividades: CatalogoItem[] = [];
   multimedia: MultimediaOferta[] = [];
   mainImageUrl: string | null = null;
   galleryUrls: string[] = [];
@@ -83,9 +88,9 @@ export class DetalleOfertaAdminComponent implements OnInit {
     this.http.get<OfertaDetalleResponse>(`${this.detalleUrl}/${idOferta}`, { headers }).subscribe({
       next: (response) => {
         this.oferta = response.oferta ?? null;
-        this.destinos = response.destinos ?? [];
-        this.actividades = response.actividades ?? [];
-        this.multimedia = response.multimedia ?? [];
+        this.destinos = this.normalizarCatalogo(response.destinos);
+        this.actividades = this.normalizarCatalogo(response.actividades);
+        this.multimedia = (response.multimedia ?? []).filter((item) => item?.status !== false);
         this.mainImageUrl = this.multimedia[0]?.url ?? null;
         this.galleryUrls = this.multimedia.slice(1).map((item) => item.url);
         this.setEstado(this.oferta?.estado);
@@ -112,5 +117,63 @@ export class DetalleOfertaAdminComponent implements OnInit {
     }
     this.estadoLabel = 'Pendiente';
     this.estadoTone = 'pending';
+  }
+
+  formatFecha(fecha?: string | null): string {
+    if (!fecha) {
+      return 'Sin fecha';
+    }
+    const clean = fecha.split('T')[0];
+    const parts = clean.split('-');
+    if (parts.length === 3) {
+      const [year, month, day] = parts;
+      if (year && month && day) {
+        return `${month}/${day}/${year}`;
+      }
+    }
+    const date = new Date(fecha);
+    if (Number.isNaN(date.getTime())) {
+      return fecha;
+    }
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${mm}/${dd}/${date.getFullYear()}`;
+  }
+
+  private normalizarCatalogo(items: unknown[] | null | undefined): CatalogoItem[] {
+    if (!Array.isArray(items)) {
+      return [];
+    }
+    return items
+      .map((item, index) => this.mapCatalogoItem(item, index))
+      .filter((item): item is CatalogoItem => item !== null);
+  }
+
+  private mapCatalogoItem(item: unknown, index: number): CatalogoItem | null {
+    if (typeof item === 'number' && Number.isFinite(item)) {
+      return { id: item, nombre: `ID ${item}` };
+    }
+    if (typeof item === 'string') {
+      const nombre = item.trim();
+      return nombre ? { id: index + 1, nombre } : null;
+    }
+    if (item == null || typeof item !== 'object') {
+      return null;
+    }
+    const record = item as Record<string, unknown>;
+    const nested = record['destino'] ?? record['actividad'] ?? record['item'];
+    const source = nested && typeof nested === 'object' ? (nested as Record<string, unknown>) : record;
+    const idValue = source['id'] ?? source['idDestino'] ?? source['idActividad'] ?? record['id'];
+    const id = Number(idValue);
+    const fallbackId = Number.isFinite(id) ? id : index + 1;
+    const nombreValue =
+      source['nombre'] ??
+      source['name'] ??
+      source['titulo'] ??
+      source['descripcion'] ??
+      record['nombre'] ??
+      record['name'];
+    const nombre = typeof nombreValue === 'string' ? nombreValue.trim() : '';
+    return { id: fallbackId, nombre: nombre || `ID ${fallbackId}` };
   }
 }

@@ -27,7 +27,7 @@
       <select formControlName="idCiudad"
               class="w-full px-5 py-4 rounded-xl border-2 border-purple-200 focus:border-purple-600 outline-none text-base transition">
         <option value="">Selecciona una opcion</option>
-        <option *ngFor="let city of cities" [value]="city.id">{{ city.name }}</option>
+        <option *ngFor="let city of cities" [value]="city.id">{{ city.nombre }}</option>
       </select>
     </div>
 

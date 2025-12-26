@@ -3,14 +3,42 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 interface CatalogoItem {
   id: number;
   nombre: string;
 }
 
-interface OfertaCreadaResponse {
+interface OfertaDetalle {
+  idOferta: number;
+  idEmpresa: number;
+  titulo: string;
+  descripcion: string;
+  precio: number;
+  fechaInicio: string;
+  fechaFin: string;
+  detalles: string;
+  estado: string;
+  fechaCreacion: string;
+  status: boolean;
+}
+
+interface MultimediaOferta {
+  idMultimediaOferta: number;
+  objectName: string;
+  url: string;
+  status: boolean;
+}
+
+interface OfertaDetalleResponse {
+  oferta: OfertaDetalle;
+  destinos: CatalogoItem[];
+  actividades: CatalogoItem[];
+  multimedia: MultimediaOferta[];
+}
+
+interface OfertaEditadaResponse {
   idOferta: number;
   idEmpresa: number;
   titulo: string;
@@ -25,7 +53,7 @@ interface OfertaCreadaResponse {
 }
 
 @Component({
-  selector: 'app-nueva-oferta',
+  selector: 'app-editar-oferta',
   standalone: true,
   imports: [
     CommonModule,
@@ -34,17 +62,26 @@ interface OfertaCreadaResponse {
     ReactiveFormsModule,
     HttpClientModule
   ],
-  templateUrl: './nueva-oferta.component.html',
-  styleUrl: './nueva-oferta.component.css'
+  templateUrl: './editar-oferta.component.html',
+  styleUrl: './editar-oferta.component.css'
 })
-export class NuevaOfertaComponent implements OnInit {
+export class EditarOfertaComponent implements OnInit {
   ofertaForm: FormGroup;
+  ofertaId: number | null = null;
+  empresaId: number | null = null;
+  loadingDetalle = false;
+  detalleError = '';
+
   fotoPrincipal: string | null = null;
   fotoPrincipalFile: File | null = null;
   fotosAdicionales: string[] = [];
   fotosAdicionalesFiles: File[] = [];
   videoPreview: string | null = null;
   videoFile: File | null = null;
+  existingMainImage: string | null = null;
+  existingImages: string[] = [];
+  existingVideoUrl: string | null = null;
+
   videoError = '';
   imagenesError = '';
   private readonly maxImages = 5;
@@ -65,7 +102,8 @@ export class NuevaOfertaComponent implements OnInit {
   showConfirm = false;
   submitted = false;
 
-  private readonly crearOfertaUrl = '/oferta/crear';
+  private readonly detalleUrl = '/oferta/detalle';
+  private readonly editarOfertaUrl = '/oferta/editar';
   private readonly actividadesUrl = '/catalogos/actividades';
   private readonly destinosUrl = '/catalogos/destinos';
   private readonly actividadesUrlDirect = 'http://localhost:8112/catalogos/actividades';
@@ -73,6 +111,7 @@ export class NuevaOfertaComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient
   ) {
@@ -87,21 +126,31 @@ export class NuevaOfertaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const id = idParam ? Number(idParam) : null;
+    if (id == null || Number.isNaN(id)) {
+      this.detalleError = 'No se encontro el identificador de la oferta.';
+      return;
+    }
+    this.ofertaId = id;
     this.cargarDestinos();
     this.cargarActividades();
+    this.cargarDetalle(id);
   }
 
   onFotoPrincipal(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files ? input.files[0] : null;
     if (file) {
-      const totalSinPrincipal = this.totalImagenes() - (this.fotoPrincipalFile ? 1 : 0);
-      if (!this.fotoPrincipalFile && totalSinPrincipal >= this.maxImages) {
+      const hasExistingMain = Boolean(this.existingMainImage);
+      const totalWithoutMain = this.totalImagenes() - (hasExistingMain ? 1 : 0);
+      if (!this.fotoPrincipalFile && !hasExistingMain && totalWithoutMain >= this.maxImages) {
         this.imagenesError = `Maximo ${this.maxImages} imagenes en total.`;
         input.value = '';
         return;
       }
       this.imagenesError = '';
+      this.existingMainImage = null;
       this.fotoPrincipalFile = file;
       const reader = new FileReader();
       reader.onload = () => (this.fotoPrincipal = reader.result as string);
@@ -128,6 +177,40 @@ export class NuevaOfertaComponent implements OnInit {
     }
   }
 
+  removeExistingMainImage() {
+    if (!this.existingMainImage) {
+      return;
+    }
+    if (this.existingImages.length) {
+      this.existingMainImage = this.existingImages.shift() || null;
+      this.fotoPrincipal = this.existingMainImage;
+    } else {
+      this.existingMainImage = null;
+      this.fotoPrincipal = null;
+    }
+    if (this.totalImagenes() <= this.maxImages) {
+      this.imagenesError = '';
+    }
+  }
+
+  removeExistingImage(index: number) {
+    if (index < 0 || index >= this.existingImages.length) {
+      return;
+    }
+    this.existingImages.splice(index, 1);
+    this.existingImages = [...this.existingImages];
+    if (this.totalImagenes() <= this.maxImages) {
+      this.imagenesError = '';
+    }
+  }
+
+  removeExistingVideo() {
+    this.existingVideoUrl = null;
+    if (!this.videoFile) {
+      this.videoPreview = null;
+    }
+  }
+
   onVideoSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files ? input.files[0] : null;
@@ -150,6 +233,7 @@ export class NuevaOfertaComponent implements OnInit {
       this.videoPreview = null;
       return;
     }
+    this.existingVideoUrl = null;
     this.videoFile = file;
     const reader = new FileReader();
     reader.onload = () => (this.videoPreview = reader.result as string);
@@ -178,7 +262,7 @@ export class NuevaOfertaComponent implements OnInit {
     }
   }
 
-  solicitarPublicacion() {
+  solicitarActualizacion() {
     this.createError = '';
     this.createSuccess = '';
     this.submitted = true;
@@ -194,21 +278,21 @@ export class NuevaOfertaComponent implements OnInit {
     this.showConfirm = true;
   }
 
-  confirmarPublicacion() {
+  confirmarActualizacion() {
     this.showConfirm = false;
-    this.publicarOferta();
+    this.actualizarOferta();
   }
 
-  cancelarPublicacion() {
+  cancelarActualizacion() {
     this.showConfirm = false;
   }
 
-  private publicarOferta() {
-    if (this.ofertaForm.invalid) {
+  private actualizarOferta() {
+    if (this.ofertaForm.invalid || this.ofertaId == null) {
       return;
     }
 
-    const idEmpresa = this.getEmpresaId();
+    const idEmpresa = this.empresaId ?? this.getEmpresaId();
     if (idEmpresa == null) {
       this.createError = 'No se encontro el id de la empresa.';
       return;
@@ -223,6 +307,7 @@ export class NuevaOfertaComponent implements OnInit {
 
     const payload = {
       oferta: {
+        idOferta: this.ofertaId,
         idEmpresa,
         titulo: formValue.titulo,
         descripcion: formValue.descripcion,
@@ -248,27 +333,75 @@ export class NuevaOfertaComponent implements OnInit {
       : new HttpHeaders();
 
     this.createLoading = true;
-    this.http.post<OfertaCreadaResponse>(this.crearOfertaUrl, formData, { headers }).subscribe({
+    this.http.put<OfertaEditadaResponse>(this.editarOfertaUrl, formData, { headers }).subscribe({
       next: () => {
         this.createLoading = false;
-        this.createSuccess = 'Oferta publicada. Esta en espera de la aprobacion del administrador.';
-        this.ofertaForm.reset();
-        this.resetMultimedia();
-        this.selectedDestinos = [];
-        this.selectedActividades = [];
+        this.createSuccess = 'Oferta actualizada correctamente.';
         this.submitted = false;
-        this.router.navigate(['/empresa/perfil', idEmpresa]);
+        if (this.ofertaId != null) {
+          this.router.navigate(['/empresa/oferta', this.ofertaId], {
+            queryParams: { updated: Date.now() }
+          });
+        }
       },
       error: () => {
         this.createLoading = false;
-        this.createError = 'No se pudo crear la oferta.';
+        this.createError = 'No se pudo actualizar la oferta.';
       }
     });
   }
 
   cancelar() {
+    if (this.ofertaId != null) {
+      this.router.navigate(['/empresa/oferta', this.ofertaId]);
+      return;
+    }
     const idEmpresa = this.getEmpresaId() ?? 1;
     this.router.navigate(['/empresa/perfil', idEmpresa]);
+  }
+
+  private cargarDetalle(idOferta: number) {
+    this.loadingDetalle = true;
+    this.detalleError = '';
+    const token = localStorage.getItem('token');
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    this.http.get<OfertaDetalleResponse>(`${this.detalleUrl}/${idOferta}`, { headers }).subscribe({
+      next: (response) => {
+        const oferta = response.oferta;
+        this.empresaId = oferta?.idEmpresa ?? this.getEmpresaId();
+        this.ofertaForm.patchValue({
+          titulo: oferta?.titulo ?? '',
+          descripcion: oferta?.descripcion ?? '',
+          precio: oferta?.precio ?? '',
+          fechaInicio: oferta?.fechaInicio ?? '',
+          fechaFin: oferta?.fechaFin ?? '',
+          detalles: oferta?.detalles ?? ''
+        });
+        this.selectedDestinos = (response.destinos ?? []).map((item) => item.id);
+        this.selectedActividades = (response.actividades ?? []).map((item) => item.id);
+
+        const media = (response.multimedia ?? []).filter((item) => item?.status !== false);
+        const images = media.filter((item) => !this.isVideo(item)).map((item) => item.url);
+        const videos = media.filter((item) => this.isVideo(item)).map((item) => item.url);
+        this.existingMainImage = images[0] ?? null;
+        this.existingImages = images.slice(1);
+        this.existingVideoUrl = videos[0] ?? null;
+        if (this.existingMainImage) {
+          this.fotoPrincipal = this.existingMainImage;
+        }
+        if (this.existingVideoUrl && !this.videoFile) {
+          this.videoPreview = this.existingVideoUrl;
+        }
+        this.loadingDetalle = false;
+      },
+      error: () => {
+        this.detalleError = 'No se pudo cargar la oferta.';
+        this.loadingDetalle = false;
+      }
+    });
   }
 
   private cargarDestinos(url = this.destinosUrl, allowFallback = true) {
@@ -322,17 +455,6 @@ export class NuevaOfertaComponent implements OnInit {
     return files.concat(this.fotosAdicionalesFiles);
   }
 
-  private resetMultimedia() {
-    this.fotoPrincipal = null;
-    this.fotoPrincipalFile = null;
-    this.fotosAdicionales = [];
-    this.fotosAdicionalesFiles = [];
-    this.videoPreview = null;
-    this.videoFile = null;
-    this.videoError = '';
-    this.imagenesError = '';
-  }
-
   private getEmpresaId(): number | null {
     const stored = localStorage.getItem('idempresa') ?? localStorage.getItem('empresaId');
     const id = stored ? Number(stored) : null;
@@ -340,7 +462,8 @@ export class NuevaOfertaComponent implements OnInit {
   }
 
   private totalImagenes(): number {
-    return (this.fotoPrincipalFile ? 1 : 0) + this.fotosAdicionalesFiles.length;
+    const principalCount = this.fotoPrincipalFile ? 1 : this.existingMainImage ? 1 : 0;
+    return principalCount + this.existingImages.length + this.fotosAdicionalesFiles.length;
   }
 
   private validarSelecciones(): boolean {
@@ -365,5 +488,12 @@ export class NuevaOfertaComponent implements OnInit {
       return false;
     }
     return true;
+  }
+
+  private isVideo(item: MultimediaOferta): boolean {
+    const value = (item.url || item.objectName || '').toLowerCase();
+    const clean = value.split('?')[0];
+    const ext = clean.split('.').pop() || '';
+    return ['mp4', 'webm', 'ogg', 'mov', 'm4v'].includes(ext);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -6,6 +6,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+
+interface CiudadCatalogo {
+  id: number;
+  nombre: string;
+}
 
 @Component({
   selector: 'app-step1-company',
@@ -17,12 +23,13 @@ import { RouterModule } from '@angular/router';
     MatButtonModule,
     MatIconModule,
     CommonModule,
-    RouterModule
+    RouterModule,
+    HttpClientModule
   ],
   templateUrl: './step1-company.component.html',
   styleUrl: './step1-company.component.css'
 })
-export class Step1CompanyComponent {
+export class Step1CompanyComponent implements OnInit {
 
   @Output() next = new EventEmitter<any>();
 
@@ -40,25 +47,18 @@ export class Step1CompanyComponent {
   logoPreview: string | null = null;
   logoFile: File | null = null;
 
-  cities = [
-    { id: 1, name: 'La Paz' },
-    { id: 2, name: 'El Alto' },
-    { id: 3, name: 'Cochabamba' },
-    { id: 4, name: 'Quillacollo' },
-    { id: 5, name: 'Santa Cruz de la Sierra' },
-    { id: 6, name: 'Montero' },
-    { id: 7, name: 'Oruro' },
-    { id: 8, name: 'Potosi' },
-    { id: 9, name: 'Uyuni' },
-    { id: 10, name: 'Sucre' },
-    { id: 11, name: 'Tarija' },
-    { id: 12, name: 'Trinidad' },
-    { id: 13, name: 'Cobija' }
-  ];
+  private readonly ciudadesUrl = '/catalogos/ciudades';
+  private readonly ciudadesUrlDirect = 'http://localhost:8112/catalogos/ciudades';
+  cities: CiudadCatalogo[] = [];
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private http: HttpClient
   ) {}
+
+  ngOnInit(): void {
+    this.cargarCiudades();
+  }
 
   onLogoSelected(event: any) {
     const file: File = event.target.files[0];
@@ -88,5 +88,25 @@ export class Step1CompanyComponent {
 
   submit(){
     this.onNext();
+  }
+
+  private cargarCiudades() {
+    this.fetchCiudades(this.ciudadesUrl);
+  }
+
+  private fetchCiudades(url: string) {
+    this.http.get<CiudadCatalogo[]>(url).subscribe({
+      next: (response) => {
+        const ciudades = Array.isArray(response) ? response : [];
+        this.cities = ciudades;
+      },
+      error: () => {
+        if (url !== this.ciudadesUrlDirect) {
+          this.fetchCiudades(this.ciudadesUrlDirect);
+          return;
+        }
+        this.cities = [];
+      }
+    });
   }
 }

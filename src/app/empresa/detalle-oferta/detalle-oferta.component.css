@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+:host {
+  font-family: 'Poppins', sans-serif;
+  display: block;
+}
+
+.font-poppins { font-family: 'Poppins', sans-serif; }
+
+.text-primary { color: #6a1b9a; }
+.text-success { color: #166534; }
+
+.material-icons {
+  font-family: 'Material Icons' !important;
+}
+
+/* Ajustes finales para que quede perfecto */
+button:focus { outline: none; }
+textarea::placeholder { color: #9ca3af; opacity: 1; }

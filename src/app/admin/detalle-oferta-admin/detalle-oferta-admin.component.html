@@ -107,7 +107,7 @@
             <h3 class="text-2xl font-bold text-purple-800 mb-4">Destinos</h3>
             <div class="flex flex-wrap gap-3">
               <span *ngFor="let destino of destinos" class="px-4 py-2 rounded-full bg-purple-100 text-purple-700 text-sm font-bold">
-                ID {{ destino }}
+                {{ destino.nombre }}
               </span>
               <span *ngIf="!destinos.length" class="text-gray-500">Sin destinos registrados.</span>
             </div>
@@ -117,7 +117,7 @@
             <h3 class="text-2xl font-bold text-purple-800 mb-4">Actividades</h3>
             <div class="flex flex-wrap gap-3">
               <span *ngFor="let actividad of actividades" class="px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-bold">
-                ID {{ actividad }}
+                {{ actividad.nombre }}
               </span>
               <span *ngIf="!actividades.length" class="text-gray-500">Sin actividades registradas.</span>
             </div>
@@ -146,13 +146,13 @@
           <div class="bg-gray-50 rounded-3xl p-8">
             <p class="text-gray-600 font-semibold mb-3">Fechas del tour</p>
             <p class="text-2xl font-bold text-purple-700">
-              Del {{ oferta.fechaInicio }} al {{ oferta.fechaFin }}
+              Del {{ formatFecha(oferta.fechaInicio) }} al {{ formatFecha(oferta.fechaFin) }}
             </p>
           </div>
 
           <div class="bg-gray-50 rounded-3xl p-8">
             <p class="text-gray-600 font-semibold mb-3">Fecha de creacion</p>
-            <p class="text-2xl font-bold text-purple-700">{{ oferta.fechaCreacion | date:'dd/MM/yyyy' }}</p>
+            <p class="text-2xl font-bold text-purple-700">{{ formatFecha(oferta.fechaCreacion) }}</p>
           </div>
         </div>
       </div>

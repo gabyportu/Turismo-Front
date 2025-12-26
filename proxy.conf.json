@@ -39,6 +39,36 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/oferta/empresa/listado-apro-pend": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/oferta/crear": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/oferta/editar": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/catalogos/ciudades": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/catalogos/actividades": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/catalogos/destinos": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/turista/registrar": {
     "target": "http://localhost:8112",
     "secure": false,

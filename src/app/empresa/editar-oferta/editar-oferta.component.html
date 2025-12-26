@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gradient-to-br from-green-50 via-purple-50 to-green-50 py-8 px-4 font-poppins">
-  <header class="bg-white shadow-lg rounded-2xl max-w-6xl mx-auto mb-8 sticky top-4 z-50">
+  <header class="bg-white shadow-lg rounded-2xl max-w-6xl mx-auto mb-8 sticky top-4 z-40">
     <div class="h-1.5 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
     <div class="px-6 py-4 flex justify-between items-center">
       <a routerLink="/home" class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-emerald-600">
@@ -10,8 +10,15 @@
   </header>
 
   <div class="max-w-6xl mx-auto">
-    <h1 class="text-4xl font-black text-center text-purple-800 mb-3">Crear oferta</h1>
-    <p class="text-center text-gray-600 mb-10">Completa los datos y sube tu multimedia</p>
+    <h1 class="text-4xl font-black text-center text-purple-800 mb-3">Editar oferta</h1>
+    <p class="text-center text-gray-600 mb-10">Actualiza los datos de tu oferta</p>
+
+    <div *ngIf="loadingDetalle" class="mb-4 rounded-2xl border border-purple-100 bg-purple-50 px-4 py-3 text-purple-700 text-sm">
+      Cargando oferta...
+    </div>
+    <div *ngIf="detalleError" class="mb-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-red-700 text-sm">
+      {{ detalleError }}
+    </div>
 
     <div *ngIf="createSuccess" class="mb-4 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-emerald-700 text-sm">
       {{ createSuccess }}
@@ -20,7 +27,7 @@
       {{ createError }}
     </div>
 
-    <form [formGroup]="ofertaForm" (ngSubmit)="solicitarPublicacion()" class="bg-white rounded-2xl shadow-xl p-8">
+    <form [formGroup]="ofertaForm" (ngSubmit)="solicitarActualizacion()" class="bg-white rounded-2xl shadow-xl p-8">
 
       <!-- FOTO PRINCIPAL -->
       <div class="mb-10">
@@ -38,6 +45,12 @@
               </div>
             </div>
           </label>
+          <div *ngIf="existingMainImage && !fotoPrincipalFile" class="mt-4 text-center">
+            <button type="button" (click)="removeExistingMainImage()"
+                    class="px-4 py-2 text-sm font-bold text-red-600 border border-red-200 rounded-full hover:bg-red-50 transition">
+              Quitar foto principal actual
+            </button>
+          </div>
           <p *ngIf="submitted && imagenesError" class="mt-3 text-center text-sm text-red-600">{{ imagenesError }}</p>
         </div>
       </div>
@@ -52,7 +65,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             <div class="text-left">
-              <p class="text-lg font-bold text-purple-800">Selecciona tus fotos</p>
+              <p class="text-lg font-bold text-purple-800">Selecciona nuevas fotos</p>
               <p class="text-gray-600 text-sm">Puedes subir hasta 5 imagenes</p>
             </div>
           </label>
@@ -69,8 +82,22 @@
           </div>
         </div>
 
-        <p *ngIf="fotosAdicionales.length === 0" class="text-center text-gray-500 italic mt-6">
-          Aun no has subido fotos adicionales
+        <div *ngIf="existingImages.length" class="mt-8">
+          <p class="text-center text-sm text-gray-500 mb-4">Fotos actuales</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <div *ngFor="let foto of existingImages; let i = index" class="relative group rounded-xl overflow-hidden shadow-md">
+              <img [src]="foto" class="w-full aspect-video object-cover">
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition"></div>
+              <button type="button" (click)="removeExistingImage(i)"
+                      class="absolute top-3 right-3 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold opacity-0 group-hover:opacity-100 transition hover:bg-red-700">
+                -
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <p *ngIf="fotosAdicionales.length === 0 && !existingImages.length" class="text-center text-gray-500 italic mt-6">
+          No hay fotos adicionales actuales
         </p>
         <p *ngIf="submitted && imagenesError" class="mt-3 text-center text-sm text-red-600">{{ imagenesError }}</p>
       </div>
@@ -91,6 +118,12 @@
               </div>
             </div>
           </label>
+          <div *ngIf="existingVideoUrl && !videoFile" class="mt-4 text-center">
+            <button type="button" (click)="removeExistingVideo()"
+                    class="px-4 py-2 text-sm font-bold text-red-600 border border-red-200 rounded-full hover:bg-red-50 transition">
+              Quitar video actual
+            </button>
+          </div>
           <p class="mt-3 text-center text-xs text-gray-600">Tamano maximo: 50 MB.</p>
           <p *ngIf="videoError" class="mt-2 text-center text-sm text-red-600">{{ videoError }}</p>
         </div>
@@ -207,7 +240,7 @@
         </button>
         <button type="submit" [disabled]="createLoading"
                 class="px-16 py-5 bg-gradient-to-r from-purple-600 to-emerald-600 text-white font-black text-xl rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition disabled:opacity-60">
-          {{ createLoading ? 'Publicando...' : 'Publicar oferta' }}
+          {{ createLoading ? 'Guardando...' : 'Guardar cambios' }}
         </button>
       </div>
     </form>
@@ -215,22 +248,22 @@
 </div>
 
 <div *ngIf="showConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-6">
-  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="cancelarPublicacion()"></div>
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="cancelarActualizacion()"></div>
   <div class="relative w-full max-w-lg rounded-3xl bg-white shadow-3xl border border-white/60 overflow-hidden">
     <div class="h-2 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
     <div class="p-8 text-center">
-      <h3 class="text-2xl font-black text-purple-800">Confirmar publicacion</h3>
-      <p class="mt-3 text-gray-700">¿Está seguro publicar la oferta?</p>
+      <h3 class="text-2xl font-black text-purple-800">Confirmar actualizacion</h3>
+      <p class="mt-3 text-gray-700">¿Esta seguro de actualizar la oferta?</p>
     </div>
     <div class="flex flex-col sm:flex-row gap-4 justify-center px-8 pb-8">
-      <button type="button" (click)="cancelarPublicacion()"
+      <button type="button" (click)="cancelarActualizacion()"
               class="px-8 py-3 border-2 border-purple-600 text-purple-700 text-lg font-bold rounded-full hover:bg-purple-50 transition">
         Editar
       </button>
-      <button type="button" (click)="confirmarPublicacion()"
+      <button type="button" (click)="confirmarActualizacion()"
               [disabled]="createLoading"
               class="px-8 py-3 text-white text-lg font-bold rounded-full shadow-lg transition bg-gradient-to-r from-emerald-600 to-emerald-700 hover:scale-105 disabled:opacity-60">
-        Publicar
+        Guardar
       </button>
     </div>
   </div>

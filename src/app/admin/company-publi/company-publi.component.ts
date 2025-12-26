@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,6 +19,7 @@ interface Publicacion {
   empresa: string;
   fecha: string;
   estado: 'pendiente' | 'aprobada' | 'rechazada';
+  ciudadId: number | null;
   ciudad: string;
   descripcion: string;
 }
@@ -36,6 +36,13 @@ interface OfertaPendiente {
   estado: string;
   fechaCreacion: string;
   status: boolean;
+  idCiudad?: number | null;
+  ciudad?: string | null;
+}
+
+interface CiudadCatalogo {
+  id: number;
+  nombre: string;
 }
 
 @Component({
@@ -66,19 +73,21 @@ export class CompanyPubliComponent implements OnInit {
   loading = false;
   errorMessage = '';
   private readonly pendientesUrl = '/oferta/pendientes';
+  private readonly ciudadesUrl = '/catalogos/ciudades';
+  private readonly ciudadesUrlDirect = 'http://localhost:8112/catalogos/ciudades';
+  private ciudadesMap = new Map<number, string>();
 
-  fechaInicio: Date | null = null;
-  fechaFin: Date | null = null;
+  fechaInicio: string | null = null;
+  fechaFin: string | null = null;
   ciudadFiltro = '';
-  estadoFiltro = '';
   busquedaRapida = '';
 
   ciudades: string[] = [];
-  estados = ['pendiente', 'aprobada', 'rechazada'];
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.cargarCiudades();
     this.cargarPendientes();
   }
 
@@ -92,18 +101,21 @@ export class CompanyPubliComponent implements OnInit {
 
     this.http.get<OfertaPendiente[]>(this.pendientesUrl, { headers }).subscribe({
       next: (response) => {
-        this.publicaciones = response.map((oferta) => ({
-          id: oferta.idOferta,
-          companyId: oferta.idEmpresa,
-          titulo: oferta.titulo,
-          empresa: `Empresa #${oferta.idEmpresa}`,
-          fecha: oferta.fechaInicio,
-          ciudad: 'Sin ciudad',
-          estado: this.normalizarEstado(oferta.estado),
-          descripcion: oferta.descripcion
-        }));
-        this.ciudades = [...new Set(this.publicaciones.map((p) => p.ciudad))];
-        this.applyFilters();
+        this.publicaciones = response.map((oferta) => {
+          const ciudadId = this.getCiudadId(oferta);
+          return {
+            id: oferta.idOferta,
+            companyId: oferta.idEmpresa,
+            titulo: oferta.titulo,
+            empresa: `Empresa #${oferta.idEmpresa}`,
+            fecha: oferta.fechaCreacion || oferta.fechaInicio,
+            ciudadId,
+            ciudad: this.getCiudadNombre(ciudadId, oferta.ciudad),
+            estado: this.normalizarEstado(oferta.estado),
+            descripcion: oferta.descripcion
+          };
+        });
+        this.actualizarCiudadesEnPublicaciones();
         this.loading = false;
       },
       error: () => {
@@ -115,25 +127,40 @@ export class CompanyPubliComponent implements OnInit {
     });
   }
 
+  cargarCiudades() {
+    const token = localStorage.getItem('token');
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : undefined;
+
+    this.fetchCiudades(this.ciudadesUrl, headers, Boolean(token));
+  }
+
   applyFilters() {
     let filtered = this.publicaciones;
-
-    if (this.estadoFiltro) {
-      filtered = filtered.filter((p) => p.estado === this.estadoFiltro);
-    }
 
     if (this.ciudadFiltro) {
       filtered = filtered.filter((p) => p.ciudad === this.ciudadFiltro);
     }
 
     if (this.fechaInicio) {
-      const inicio = new Date(this.fechaInicio);
-      filtered = filtered.filter((p) => new Date(p.fecha) >= inicio);
+      const inicio = this.parseDateValue(this.fechaInicio);
+      if (inicio) {
+        filtered = filtered.filter((p) => {
+          const fecha = this.parseDateValue(p.fecha);
+          return fecha ? fecha >= inicio : false;
+        });
+      }
     }
 
     if (this.fechaFin) {
-      const fin = new Date(this.fechaFin);
-      filtered = filtered.filter((p) => new Date(p.fecha) <= fin);
+      const fin = this.parseDateValue(this.fechaFin);
+      if (fin) {
+        filtered = filtered.filter((p) => {
+          const fecha = this.parseDateValue(p.fecha);
+          return fecha ? fecha <= fin : false;
+        });
+      }
     }
 
     if (this.busquedaRapida) {
@@ -159,9 +186,8 @@ export class CompanyPubliComponent implements OnInit {
     this.fechaInicio = null;
     this.fechaFin = null;
     this.ciudadFiltro = '';
-    this.estadoFiltro = '';
     this.busquedaRapida = '';
-    this.dataSource = this.publicaciones.filter((p) => p.estado === 'pendiente');
+    this.applyFilters();
   }
 
   private normalizarEstado(estado: string | null | undefined): Publicacion['estado'] {
@@ -176,5 +202,78 @@ export class CompanyPubliComponent implements OnInit {
       return 'rechazada';
     }
     return 'pendiente';
+  }
+
+  private actualizarCiudadesEnPublicaciones() {
+    if (!this.publicaciones.length) {
+      return;
+    }
+    this.publicaciones = this.publicaciones.map((pub) => ({
+      ...pub,
+      ciudad: this.getCiudadNombre(pub.ciudadId, pub.ciudad)
+    }));
+    this.applyFilters();
+  }
+
+  private getCiudadId(oferta: OfertaPendiente): number | null {
+    const id = Number(oferta.idCiudad);
+    return Number.isFinite(id) ? id : null;
+  }
+
+  private getCiudadNombre(ciudadId: number | null, fallback?: string | null): string {
+    if (ciudadId != null) {
+      const nombre = this.ciudadesMap.get(ciudadId);
+      if (nombre) {
+        return nombre;
+      }
+    }
+    const value = (fallback ?? '').trim();
+    return value || 'Sin ciudad';
+  }
+
+  private parseDateValue(value: string | Date | null | undefined): Date | null {
+    if (!value) {
+      return null;
+    }
+    if (value instanceof Date) {
+      return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+    }
+    if (typeof value === 'string') {
+      const clean = value.split('T')[0];
+      const parts = clean.split('-');
+      if (parts.length === 3) {
+        const [year, month, day] = parts;
+        if (year && month && day) {
+          return new Date(Number(year), Number(month) - 1, Number(day));
+        }
+      }
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+    return null;
+  }
+
+  private fetchCiudades(url: string, headers?: HttpHeaders, retryWithoutAuth = false) {
+    this.http.get<CiudadCatalogo[]>(url, { headers }).subscribe({
+      next: (response) => {
+        const ciudades = Array.isArray(response) ? response : [];
+        this.ciudadesMap = new Map(ciudades.map((ciudad) => [ciudad.id, ciudad.nombre]));
+        this.ciudades = ciudades.map((ciudad) => ciudad.nombre);
+        this.actualizarCiudadesEnPublicaciones();
+      },
+      error: () => {
+        if (retryWithoutAuth) {
+          this.fetchCiudades(url, undefined, false);
+          return;
+        }
+        if (url !== this.ciudadesUrlDirect) {
+          this.fetchCiudades(this.ciudadesUrlDirect, undefined, false);
+          return;
+        }
+        this.ciudadesMap = new Map();
+        this.ciudades = [];
+        this.actualizarCiudadesEnPublicaciones();
+      }
+    });
   }
 }
