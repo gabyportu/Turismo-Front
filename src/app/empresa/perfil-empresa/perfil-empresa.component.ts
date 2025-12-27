@@ -110,8 +110,21 @@ export class PerfilEmpresaComponent implements OnInit {
 
   editarPerfil() {
     if (this.empresaId != null) {
-      this.router.navigate(['/empresa/perfil', this.empresaId], { queryParams: { editar: true } });
+      this.router.navigate(['/empresa/editar-empresa', this.empresaId]);
     }
+  }
+
+  cerrarSesion() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('id_usuario');
+    localStorage.removeItem('id_turista');
+    localStorage.removeItem('idempresa');
+    localStorage.removeItem('empresaId');
+    localStorage.removeItem('userLoggedIn');
+    localStorage.removeItem('userLoggendIn');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('adminLoggedIn');
+    this.router.navigate(['/login']);
   }
 
   getCiudadNombre(idCiudad?: number | null): string {

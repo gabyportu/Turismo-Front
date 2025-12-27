@@ -7,7 +7,9 @@
       <a routerLink="/home" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-emerald-600">
         Susurros de Bolivia
       </a>
-      <a routerLink="/home" class="text-purple-700 font-bold text-lg hover:underline">Volver al inicio</a>
+      <button type="button" (click)="cerrarSesion()" class="text-purple-700 font-bold text-lg hover:underline">
+        Cerrar sesion
+      </button>
     </div>
   </header>
 
@@ -110,7 +112,7 @@
         </button>
         <button type="button" (click)="editarPerfil()"
                 class="px-8 py-4 border-2 border-purple-600 text-purple-700 font-bold rounded-full hover:bg-purple-50 transition">
-          Editar perfil
+          Editar empresa
         </button>
       </div>
     </section>

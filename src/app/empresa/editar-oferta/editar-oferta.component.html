@@ -28,6 +28,13 @@
     </div>
 
     <form [formGroup]="ofertaForm" (ngSubmit)="solicitarActualizacion()" class="bg-white rounded-2xl shadow-xl p-8">
+      <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 text-sm">
+        <p class="font-semibold">Advertencia sobre imágenes</p>
+        <p class="mt-1">
+          Si eliminas una imagen en esta edicion se eliminaran todas las imágenes.  Vuelve a subir las que
+          quieras conservar.
+        </p>
+      </div>
 
       <!-- FOTO PRINCIPAL -->
       <div class="mb-10">
@@ -252,8 +259,8 @@
   <div class="relative w-full max-w-lg rounded-3xl bg-white shadow-3xl border border-white/60 overflow-hidden">
     <div class="h-2 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
     <div class="p-8 text-center">
-      <h3 class="text-2xl font-black text-purple-800">Confirmar actualizacion</h3>
-      <p class="mt-3 text-gray-700">¿Esta seguro de actualizar la oferta?</p>
+      <h3 class="text-2xl font-black text-purple-800">Confirmar actualización</h3>
+      <p class="mt-3 text-gray-700">¿Está seguro de actualizar la oferta?</p>
     </div>
     <div class="flex flex-col sm:flex-row gap-4 justify-center px-8 pb-8">
       <button type="button" (click)="cancelarActualizacion()"

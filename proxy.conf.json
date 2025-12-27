@@ -54,7 +54,22 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/oferta/aprobadas": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/oferta/mejor-puntuadas": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/catalogos/ciudades": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/catalogos/departamentos": {
     "target": "http://localhost:8112",
     "secure": false,
     "changeOrigin": true
@@ -70,6 +85,16 @@
     "changeOrigin": true
   },
   "/turista/registrar": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/resenas/oferta": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/resenas/crear": {
     "target": "http://localhost:8112",
     "secure": false,
     "changeOrigin": true

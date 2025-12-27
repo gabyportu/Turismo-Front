@@ -1,0 +1,224 @@
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-purple-50 to-green-50 py-8 px-4 font-poppins">
+  <header class="bg-white shadow-lg rounded-2xl max-w-6xl mx-auto mb-8 sticky top-4 z-40">
+    <div class="h-1.5 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
+    <div class="px-6 py-4 flex justify-between items-center">
+      <a routerLink="/home" class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-emerald-600">
+        Susurros de Bolivia
+      </a>
+      <button type="button" (click)="cancelar()" class="text-purple-700 font-medium hover:underline">Cancelar</button>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-4xl font-black text-center text-purple-800 mb-3">Editar perfil de empresa</h1>
+    <p class="text-center text-gray-600 mb-10">Actualiza los datos publicos de tu empresa</p>
+
+    <div *ngIf="loadingDetalle" class="mb-4 rounded-2xl border border-purple-100 bg-purple-50 px-4 py-3 text-purple-700 text-sm">
+      Cargando datos de la empresa...
+    </div>
+    <div *ngIf="detalleError" class="mb-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-red-700 text-sm">
+      {{ detalleError }}
+    </div>
+
+    <div *ngIf="createSuccess" class="mb-4 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-emerald-700 text-sm">
+      {{ createSuccess }}
+    </div>
+    <div *ngIf="createError" class="mb-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-red-700 text-sm">
+      {{ createError }}
+    </div>
+
+    <form [formGroup]="empresaForm" (ngSubmit)="solicitarActualizacion()" class="bg-white rounded-2xl shadow-xl p-8">
+      <div class="mb-10">
+        <p class="text-lg font-semibold text-purple-700 mb-4 text-center">Logo de la empresa</p>
+        <div class="relative max-w-2xl mx-auto">
+          <input type="file" accept="image/*" (change)="onLogoSelected($event)" class="hidden" id="logoEmpresa">
+          <label for="logoEmpresa" class="block cursor-pointer">
+            <div class="aspect-video bg-gray-100 border-4 border-dashed border-emerald-400 rounded-2xl overflow-hidden hover:border-emerald-600 transition">
+              <img *ngIf="logoPreview" [src]="logoPreview" class="w-full h-full object-cover">
+              <div *ngIf="!logoPreview" class="flex flex-col items-center justify-center h-72 text-emerald-600">
+                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <p class="text-xl font-bold">Sube el logo de tu empresa</p>
+              </div>
+            </div>
+          </label>
+          <div *ngIf="logoPreview" class="mt-4 text-center">
+            <button type="button" (click)="removeLogo()"
+                    class="px-4 py-2 text-sm font-bold text-red-600 border border-red-200 rounded-full hover:bg-red-50 transition">
+              Quitar logo
+            </button>
+          </div>
+          <p *ngIf="logoError" class="mt-3 text-center text-sm text-red-600">{{ logoError }}</p>
+        </div>
+      </div>
+
+      <div class="mb-10">
+        <p class="text-lg font-semibold text-purple-700 mb-4 text-center">Datos de la empresa</p>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre *</label>
+            <input type="text" formControlName="nombre" placeholder="Empresa Editada"
+                   class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+            <div *ngIf="(empresaForm.get('nombre')?.touched || submitted) && empresaForm.get('nombre')?.invalid" class="mt-2 text-sm text-red-600">
+              <span *ngIf="empresaForm.get('nombre')?.hasError('required')">Campo obligatorio.</span>
+              <span *ngIf="empresaForm.get('nombre')?.hasError('minlength')">Minimo 3 caracteres.</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Ciudad *</label>
+            <select formControlName="idCiudad"
+                    class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+              <option value="">Selecciona una ciudad</option>
+              <option *ngFor="let ciudad of ciudadesCatalogo" [value]="ciudad.id">
+                {{ ciudad.nombre }}
+              </option>
+            </select>
+            <p *ngIf="loadingCiudades" class="mt-2 text-xs text-purple-600">Cargando ciudades...</p>
+            <p *ngIf="ciudadesError" class="mt-2 text-xs text-red-600">{{ ciudadesError }}</p>
+            <div *ngIf="(empresaForm.get('idCiudad')?.touched || submitted) && empresaForm.get('idCiudad')?.invalid" class="mt-2 text-sm text-red-600">
+              Campo obligatorio.
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Facebook</label>
+            <input type="text" formControlName="facebook" placeholder="fb.com/empresa"
+                   class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Descripcion *</label>
+            <textarea formControlName="descripcion" rows="4" placeholder="Nueva descripcion"
+                      class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:border-purple-500 resize-none"></textarea>
+            <div *ngIf="(empresaForm.get('descripcion')?.touched || submitted) && empresaForm.get('descripcion')?.invalid" class="mt-2 text-sm text-red-600">
+              <span *ngIf="empresaForm.get('descripcion')?.hasError('required')">Campo obligatorio.</span>
+              <span *ngIf="empresaForm.get('descripcion')?.hasError('minlength')">Minimo 10 caracteres.</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Instagram</label>
+            <input type="text" formControlName="instagram" placeholder="@empresa"
+                   class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-10">
+        <p class="text-lg font-semibold text-purple-700 mb-4 text-center">Datos del usuario</p>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Nombres *</label>
+            <input type="text" formControlName="nombres" placeholder="Ana"
+                   class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+            <div *ngIf="(empresaForm.get('nombres')?.touched || submitted) && empresaForm.get('nombres')?.invalid" class="mt-2 text-sm text-red-600">
+              <span *ngIf="empresaForm.get('nombres')?.hasError('required')">Campo obligatorio.</span>
+              <span *ngIf="empresaForm.get('nombres')?.hasError('minlength')">Minimo 2 caracteres.</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Apellido paterno *</label>
+            <input type="text" formControlName="apellidoPaterno" placeholder="Perez"
+                   class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+            <div *ngIf="(empresaForm.get('apellidoPaterno')?.touched || submitted) && empresaForm.get('apellidoPaterno')?.invalid" class="mt-2 text-sm text-red-600">
+              <span *ngIf="empresaForm.get('apellidoPaterno')?.hasError('required')">Campo obligatorio.</span>
+              <span *ngIf="empresaForm.get('apellidoPaterno')?.hasError('minlength')">Minimo 2 caracteres.</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Apellido materno</label>
+            <input type="text" formControlName="apellidoMaterno" placeholder="Lopez"
+                   class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Telefono *</label>
+            <input type="text" formControlName="telefono" placeholder="77777777"
+                   class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+            <div *ngIf="(empresaForm.get('telefono')?.touched || submitted) && empresaForm.get('telefono')?.invalid" class="mt-2 text-sm text-red-600">
+              <span *ngIf="empresaForm.get('telefono')?.hasError('required')">Campo obligatorio.</span>
+              <span *ngIf="empresaForm.get('telefono')?.hasError('minlength')">Minimo 6 caracteres.</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Genero *</label>
+            <select formControlName="genero"
+                    class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+              <option value="">Selecciona</option>
+              <option value="F">Femenino</option>
+              <option value="M">Masculino</option>
+              <option value="O">Otro</option>
+            </select>
+            <div *ngIf="(empresaForm.get('genero')?.touched || submitted) && empresaForm.get('genero')?.invalid" class="mt-2 text-sm text-red-600">
+              Campo obligatorio.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-10">
+        <p class="text-lg font-semibold text-purple-700 mb-4 text-center">Representante legal</p>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Numero de documento *</label>
+            <input type="text" formControlName="numeroDocumento" placeholder="1234567"
+                   class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+            <div *ngIf="(empresaForm.get('numeroDocumento')?.touched || submitted) && empresaForm.get('numeroDocumento')?.invalid" class="mt-2 text-sm text-red-600">
+              <span *ngIf="empresaForm.get('numeroDocumento')?.hasError('required')">Campo obligatorio.</span>
+              <span *ngIf="empresaForm.get('numeroDocumento')?.hasError('minlength')">Minimo 4 caracteres.</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Extension *</label>
+            <select formControlName="extension"
+                    class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none">
+              <option value="">Selecciona</option>
+              <option value="LP">LP</option>
+              <option value="CB">CB</option>
+              <option value="SC">SC</option>
+              <option value="OR">OR</option>
+              <option value="PT">PT</option>
+              <option value="TJ">TJ</option>
+              <option value="BN">BN</option>
+              <option value="PD">PD</option>
+              <option value="CH">CH</option>
+            </select>
+            <div *ngIf="(empresaForm.get('extension')?.touched || submitted) && empresaForm.get('extension')?.invalid" class="mt-2 text-sm text-red-600">
+              Campo obligatorio.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-center gap-8">
+        <button type="button" (click)="cancelar()"
+                class="px-12 py-4 border-2 border-purple-700 text-purple-700 font-bold rounded-xl hover:bg-purple-50 transition">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="createLoading"
+                class="px-16 py-5 bg-gradient-to-r from-purple-600 to-emerald-600 text-white font-black text-xl rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition disabled:opacity-60">
+          {{ createLoading ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div *ngIf="showConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-6">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="cancelarActualizacion()"></div>
+  <div class="relative w-full max-w-lg rounded-3xl bg-white shadow-3xl border border-white/60 overflow-hidden">
+    <div class="h-2 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
+    <div class="p-8 text-center">
+      <h3 class="text-2xl font-black text-purple-800">Confirmar actualizacion</h3>
+      <p class="mt-3 text-gray-700">Estas seguro de actualizar los datos de la empresa?</p>
+    </div>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center px-8 pb-8">
+      <button type="button" (click)="cancelarActualizacion()"
+              class="px-8 py-3 border-2 border-purple-600 text-purple-700 text-lg font-bold rounded-full hover:bg-purple-50 transition">
+        Revisar
+      </button>
+      <button type="button" (click)="confirmarActualizacion()"
+              [disabled]="createLoading"
+              class="px-8 py-3 text-white text-lg font-bold rounded-full shadow-lg transition bg-gradient-to-r from-emerald-600 to-emerald-700 hover:scale-105 disabled:opacity-60">
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>

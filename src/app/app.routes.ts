@@ -43,6 +43,10 @@ export const routes: Routes = [
         loadComponent: () => import('./empresa/perfil-empresa/perfil-empresa.component')
             .then(m => m.PerfilEmpresaComponent)
     },
+    {path: 'empresa/editar-empresa/:id',
+        loadComponent: () => import('./empresa/editar-empresa/editar-empresa.component')
+            .then(m => m.EditarEmpresaComponent)
+    },
     {path: 'crear-oferta',
         loadComponent: () => import('./empresa/nueva-oferta/nueva-oferta.component')
             .then(m => m.NuevaOfertaComponent)

@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-gradient-to-br from-green-50 via-purple-50 to-green-50 font-poppins">
-
   <!-- HEADER -->
   <header class="bg-white shadow-lg sticky top-0 z-50">
     <div class="h-1 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
@@ -18,138 +17,288 @@
     </div>
   </header>
 
-  <!-- HERO + BUSCADOR GRANDE -->
+  <!-- HERO + BUSQUEDA RAPIDA -->
   <section class="py-20 text-center px-6">
     <h2 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-emerald-700 mb-4">
       Vive la aventura boliviana
     </h2>
-    <p class="text-xl text-gray-700 mb-12">Explora rutas únicas en el corazón de Sudamérica</p>
+    <p class="text-xl text-gray-700 mb-12">
+      Explora rutas unicas en el corazon de Sudamerica
+    </p>
 
     <div class="max-w-4xl mx-auto">
       <div class="bg-white rounded-full shadow-2xl p-5 flex items-center border-4 border-transparent hover:border-purple-400 transition-all">
-        <input type="text" placeholder="Salar de Uyuni, Death Road, Torotoro, Pampas..." 
-               class="flex-1 px-8 text-lg outline-none text-gray-800">
-        <button class="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-6 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-110 transition">
+        <input
+          type="text"
+          [value]="busquedaRapida"
+          (input)="onSearchChange($event)"
+          placeholder="Buscar por destino, empresa o actividad..."
+          class="flex-1 px-8 text-lg outline-none text-gray-800"
+        >
+        <button
+          type="button"
+          (click)="onFiltersChange()"
+          class="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-6 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-110 transition"
+        >
           <span class="material-icons text-4xl">search</span>
         </button>
       </div>
     </div>
   </section>
 
-  <!-- FILTROS COMO ANTES: REDONDOS, BONITOS, SIN MATERIAL -->
-  <section class="bg-white py-8 border-t-4 border-purple-600 sticky top-20 z-40 shadow-md">
-    <div class="max-w-7xl mx-auto px-8">
-      <div class="flex flex-wrap gap-5 justify-center items-center">
+  <!-- FILTROS -->
+  <section class="bg-white py-6 border-t border-purple-200 sticky top-20 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-purple-700 mb-1">Departamentos</label>
+          <div class="rounded-xl border border-purple-200 bg-white p-3 max-h-44 overflow-y-auto">
+            <label *ngFor="let dep of departamentos" class="flex items-center gap-2 text-sm text-gray-700 py-1">
+              <input
+                type="checkbox"
+                class="accent-purple-600"
+                [checked]="selectedDepartamentos.includes(dep.id)"
+                (change)="toggleSeleccion(dep.id, selectedDepartamentos, $event)"
+              >
+              <span>{{ dep.nombre }}</span>
+            </label>
+          </div>
+        </div>
 
-        <!-- FILTRO DESTINO -->
-        <select class="px-8 py-4 bg-white border-2 border-purple-200 rounded-full font-medium text-gray-800 hover:border-purple-500 focus:border-purple-600 focus:outline-none transition shadow-md">
-          <option>Todos los destinos</option>
-          <option>Salar de Uyuni</option>
-          <option>Death Road</option>
-          <option>Torotoro</option>
-          <option>Lago Titicaca</option>
-          <option>Pampas del Yacuma</option>
-          <option>Madidi</option>
-        </select>
+        <div>
+          <label class="block text-xs font-semibold text-purple-700 mb-1">Ciudades</label>
+          <div class="rounded-xl border border-purple-200 bg-white p-3 max-h-44 overflow-y-auto">
+            <label *ngFor="let ciudad of ciudades" class="flex items-center gap-2 text-sm text-gray-700 py-1">
+              <input
+                type="checkbox"
+                class="accent-purple-600"
+                [checked]="selectedCiudades.includes(ciudad.id)"
+                (change)="toggleSeleccion(ciudad.id, selectedCiudades, $event)"
+              >
+              <span>{{ ciudad.nombre }}</span>
+            </label>
+          </div>
+        </div>
 
-        <!-- FILTRO ACTIVIDAD -->
-        <select class="px-8 py-4 bg-white border-2 border-purple-200 rounded-full font-medium text-gray-800 hover:border-purple-500 focus:border-purple-600 focus:outline-none transition shadow-md">
-          <option>Tipo de aventura</option>
-          <option>4x4</option>
-          <option>Trekking</option>
-          <option>Ciclismo</option>
-          <option>Parapente</option>
-          <option>Kayak</option>
-          <option>Observación de fauna</option>
-        </select>
+        <div>
+          <label class="block text-xs font-semibold text-purple-700 mb-1">Actividades</label>
+          <div class="rounded-xl border border-purple-200 bg-white p-3 max-h-44 overflow-y-auto">
+            <label *ngFor="let act of actividades" class="flex items-center gap-2 text-sm text-gray-700 py-1">
+              <input
+                type="checkbox"
+                class="accent-purple-600"
+                [checked]="selectedActividades.includes(act.id)"
+                (change)="toggleSeleccion(act.id, selectedActividades, $event)"
+              >
+              <span>{{ act.nombre }}</span>
+            </label>
+          </div>
+        </div>
 
-        <!-- FILTRO DIFICULTAD -->
-        <select class="px-8 py-4 bg-white border-2 border-purple-200 rounded-full font-medium text-gray-800 hover:border-purple-500 focus:border-purple-600 focus:outline-none transition shadow-md">
-          <option>Dificultad</option>
-          <option>Fácil</option>
+        <div>
+          <label class="block text-xs font-semibold text-purple-700 mb-1">Desde</label>
+          <input
+            type="date"
+            [(ngModel)]="fechaInicio"
+            (change)="onFiltersChange()"
+            class="w-full px-4 py-3 rounded-xl border border-purple-200 focus:border-purple-600 outline-none text-sm"
           >
-          <option>Moderado</option>
-          <option>Difícil</option>
-          <option>Extremo</option>
-        </select>
+        </div>
 
-        <!-- FILTRO PRECIO -->
-        <select class="px-8 py-4 bg-white border-2 border-purple-200 rounded-full font-medium text-gray-800 hover:border-purple-500 focus:border-purple-600 focus:outline-none transition shadow-md">
-          <option>Precio por persona</option>
-          <option>Menos de 800 Bs</option>
-          <option>800 - 1.500 Bs</option>
-          <option>1.500 - 3.000 Bs</option>
-          <option>Más de 3.000 Bs</option>
-        </select>
+        <div>
+          <label class="block text-xs font-semibold text-purple-700 mb-1">Hasta</label>
+          <input
+            type="date"
+            [(ngModel)]="fechaFin"
+            (change)="onFiltersChange()"
+            class="w-full px-4 py-3 rounded-xl border border-purple-200 focus:border-purple-600 outline-none text-sm"
+          >
+        </div>
 
-        <!-- BOTÓN OFERTAS -->
-        <button class="px-10 py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-full font-bold shadow-lg hover:shadow-emerald-500/50 transition transform hover:scale-105">
-          Ofertas del Mes
-        </button>
+        <div class="flex items-end">
+          <button
+            type="button"
+            (click)="limpiarFiltros()"
+            class="w-full px-4 py-3 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold rounded-xl text-sm"
+          >
+            Limpiar filtros
+          </button>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- RUTAS DESTACADAS - AHORA CLICABLES -->
-<section class="py-16 px-8">
-  <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-10">
-      <h2 class="text-4xl font-bold text-purple-800">Rutas más populares</h2>
-      <a href="#" class="text-purple-700 font-medium hover:underline">Ver todas →</a>
-    </div>
+  <!-- TOP 5 MEJOR PUNTUADAS -->
+  <section class="py-16 px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex justify-between items-center mb-10">
+        <h2 class="text-4xl font-bold text-purple-800">Top 5 mejor puntuadas</h2>
+      </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-      <!-- CADA TARJETA ES CLICABLE -->
-      <div *ngFor="let ruta of rutas" 
-           class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer transform hover:-translate-y-2"
-           (click)="irADetalle(ruta.id)">
-        
-        <div class="relative">
-          <img [src]="ruta.imagen" [alt]="ruta.titulo" 
-               class="w-full h-64 object-cover group-hover:scale-110 transition duration-500">
+      <div *ngIf="loadingTop" class="mb-6 rounded-2xl border border-purple-100 bg-purple-50 px-6 py-4 text-purple-700 text-sm">
+        Cargando ofertas destacadas...
+      </div>
+      <div *ngIf="topError" class="mb-6 rounded-2xl border border-red-100 bg-red-50 px-6 py-4 text-red-700 text-sm">
+        {{ topError }}
+      </div>
+      <div *ngIf="!loadingTop && !topOfertas.length" class="text-center text-gray-500 py-12">
+        No hay ofertas destacadas para mostrar.
+      </div>
 
-          <!-- Botón favorito (no interfiere con el clic principal) -->
-          <button (click)="$event.stopPropagation()" 
-                  class="absolute top-4 right-4 bg-white/90 p-3 rounded-full shadow-lg hover:scale-110 transition z-10">
-            <span class="material-icons text-red-600 text-2xl">favorite_border</span>
-          </button>
-
-          <!-- Etiqueta "Más vendido" -->
-          <div *ngIf="ruta.destacado" 
-               class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
-            Más vendido
-          </div>
-        </div>
-
-        <div class="p-6">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="text-emerald-700 font-semibold">{{ ruta.destino }}</span>
-            <span class="px-3 py-1 rounded-full text-xs font-bold border"
-                  [ngClass]="getColorDificultad(ruta.dificultad)">
-              {{ ruta.dificultad }}
-            </span>
-          </div>
-
-          <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{{ ruta.titulo }}</h3>
-          <p class="text-gray-600 text-sm mb-4">Por {{ ruta.operador }}</p>
-
-          <div class="flex justify-between items-end">
-            <div>
-              <span class="text-3xl font-bold text-purple-700">{{ ruta.precio }}</span>
-              <span class="text-gray-600"> Bs</span>
-              <p class="text-xs text-gray-500">por persona</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+        <div
+          *ngFor="let oferta of topOfertas; trackBy: trackByOfertaId"
+          class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer transform hover:-translate-y-2"
+          (click)="irADetalle(oferta.id)"
+        >
+          <div class="relative">
+            <img
+              *ngIf="oferta.imagenUrl"
+              [src]="oferta.imagenUrl"
+              [alt]="oferta.titulo"
+              class="w-full h-56 object-cover group-hover:scale-110 transition duration-500"
+            >
+            <div
+              *ngIf="!oferta.imagenUrl"
+              class="w-full h-56 bg-gray-100 flex items-center justify-center text-gray-500 text-sm"
+            >
+              Sin imagen
             </div>
-            <div class="flex items-center gap-1">
-              <span class="material-icons text-yellow-500 text-xl">star</span>
-              <span class="font-bold">{{ ruta.calificacion }}</span>
-              <span class="text-gray-500 text-sm">({{ ruta.resenas }})</span>
+          </div>
+
+          <div class="p-5">
+            <p class="text-emerald-700 font-semibold text-sm mb-1"
+               *ngIf="oferta.ciudadNombre || oferta.departamentoNombre || oferta.destino">
+              {{ oferta.ciudadNombre || oferta.departamentoNombre || oferta.destino }}
+            </p>
+            <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ oferta.titulo }}</h3>
+            <p class="text-xs text-gray-600 mb-4">Por {{ oferta.operador || 'Empresa' }}</p>
+
+            <div class="flex justify-between items-end">
+              <div>
+                <span class="text-2xl font-bold text-purple-700">
+                  {{ oferta.precio != null ? oferta.precio : '---' }}
+                </span>
+                <span class="text-gray-600"> Bs</span>
+              </div>
+              <div class="flex items-center gap-1 text-sm">
+                <span class="material-icons text-yellow-500 text-base">star</span>
+                <span class="font-bold">
+                  {{ oferta.calificacion != null ? (oferta.calificacion | number:'1.1-2') : '-' }}
+                </span>
+                <span class="text-gray-500" *ngIf="oferta.resenas != null">({{ oferta.resenas }})</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+
+  <!-- OFERTAS APROBADAS -->
+  <section class="pb-20 px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex justify-between items-center mb-10">
+        <h2 class="text-4xl font-bold text-purple-800">Ofertas aprobadas</h2>
+      </div>
+
+      <div *ngIf="loadingAprobadas" class="mb-6 rounded-2xl border border-purple-100 bg-purple-50 px-6 py-4 text-purple-700 text-sm">
+        Cargando ofertas aprobadas...
+      </div>
+      <div *ngIf="aprobadasError" class="mb-6 rounded-2xl border border-red-100 bg-red-50 px-6 py-4 text-red-700 text-sm">
+        {{ aprobadasError }}
+      </div>
+
+      <div *ngIf="!loadingAprobadas && !ofertasFiltradas.length" class="text-center text-gray-500 py-12">
+        No hay ofertas aprobadas con esos filtros.
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div
+          *ngFor="let oferta of ofertasPaginadas; trackBy: trackByOfertaId"
+          class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer transform hover:-translate-y-2"
+          (click)="irADetalle(oferta.id)"
+        >
+          <div class="relative">
+            <img
+              *ngIf="oferta.imagenUrl"
+              [src]="oferta.imagenUrl"
+              [alt]="oferta.titulo"
+              class="w-full h-60 object-cover group-hover:scale-110 transition duration-500"
+            >
+            <div
+              *ngIf="!oferta.imagenUrl"
+              class="w-full h-60 bg-gray-100 flex items-center justify-center text-gray-500 text-sm"
+            >
+              Sin imagen
+            </div>
+          </div>
+
+          <div class="p-6">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-emerald-700 font-semibold"
+                    *ngIf="oferta.ciudadNombre || oferta.departamentoNombre || oferta.destino">
+                {{ oferta.ciudadNombre || oferta.departamentoNombre || oferta.destino }}
+              </span>
+              <span
+                class="px-3 py-1 rounded-full text-xs font-bold border border-purple-200 text-purple-700"
+                *ngIf="oferta.actividadesNombres.length"
+              >
+                {{ oferta.actividadesNombres[0] }}
+              </span>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{{ oferta.titulo }}</h3>
+            <p class="text-gray-600 text-sm mb-4">Por {{ oferta.operador || 'Empresa' }}</p>
+
+            <div class="flex justify-between items-end">
+              <div>
+                <span class="text-3xl font-bold text-purple-700">
+                  {{ oferta.precio != null ? oferta.precio : '---' }}
+                </span>
+                <span class="text-gray-600"> Bs</span>
+                <p class="text-xs text-gray-500">por persona</p>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="material-icons text-yellow-500 text-xl">star</span>
+                <span class="font-bold">
+                  {{ oferta.calificacion != null ? (oferta.calificacion | number:'1.1-2') : '-' }}
+                </span>
+                <span class="text-gray-500 text-sm" *ngIf="oferta.resenas != null">({{ oferta.resenas }})</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="totalPages > 1" class="flex flex-wrap justify-center items-center gap-3 mt-12">
+        <button
+          type="button"
+          (click)="prevPage()"
+          class="px-4 py-2 rounded-full border border-purple-200 text-purple-700 font-semibold hover:bg-purple-50 transition"
+        >
+          Anterior
+        </button>
+        <button
+          *ngFor="let page of pageNumbers"
+          type="button"
+          (click)="goToPage(page)"
+          [class.bg-purple-700]="page === currentPage"
+          [class.text-white]="page === currentPage"
+          class="px-4 py-2 rounded-full border border-purple-200 text-purple-700 font-semibold hover:bg-purple-50 transition"
+        >
+          {{ page }}
+        </button>
+        <button
+          type="button"
+          (click)="nextPage()"
+          class="px-4 py-2 rounded-full border border-purple-200 text-purple-700 font-semibold hover:bg-purple-50 transition"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </section>
 
   <!-- FOOTER DISCRETO -->
   <footer class="bg-gray-900 text-white py-12 mt-20">
@@ -157,7 +306,7 @@
       <h3 class="text-3xl font-bold mb-3">Susurros de Bolivia</h3>
       <p class="text-gray-400 mb-6">La plataforma oficial de turismo de aventura</p>
       <div class="h-px bg-gray-700 w-32 mx-auto mb-6"></div>
-      <p class="text-sm text-gray-500">© 2025 Susurros de Bolivia • Hecho con amor en La Paz</p>
+      <p class="text-sm text-gray-500">2025 Susurros de Bolivia - Hecho con amor en La Paz</p>
     </div>
   </footer>
 </div>
