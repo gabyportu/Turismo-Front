@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ChatService } from '../../services/chat.service';
 
 interface OfertaDetalle {
   idOferta: number;
@@ -102,7 +103,8 @@ export class OfertaDetalleComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private chatService: ChatService
   ) {}
 
   ngOnInit(): void {
@@ -164,9 +166,15 @@ export class OfertaDetalleComponent implements OnInit {
     });
   }
 
-  abrirChatConEmpresa(empresa: string) {
-    const event = new CustomEvent('abrir-chat', { detail: empresa });
-    document.dispatchEvent(event);
+  abrirChatConEmpresa() {
+    if (!this.oferta || this.oferta.idEmpresa == null) {
+      return;
+    }
+    const empresaNombre = this.empresaNombre || 'Empresa';
+    this.chatService.abrirChat({
+      idEmpresa: this.oferta.idEmpresa,
+      empresa: empresaNombre
+    });
   }
 
   get empresaInicial(): string {

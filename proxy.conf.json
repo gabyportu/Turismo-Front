@@ -44,6 +44,11 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/oferta/empresa/listado": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/oferta/crear": {
     "target": "http://localhost:8112",
     "secure": false,

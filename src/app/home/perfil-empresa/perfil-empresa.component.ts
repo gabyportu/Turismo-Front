@@ -1,27 +1,41 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 
-interface Servicio {
-  id: number;
-  titulo: string;
-  precio: number;
-  duracion: string;
-  imagen: string;
-  calificacion: number;
-  resenas: number;
+interface EmpresaDetalle {
+  idEmpresa: number;
+  idCiudad?: number | null;
+  nombre: string;
+  nit?: string | null;
+  descripcion?: string | null;
+  facebook?: string | null;
+  instagram?: string | null;
+  whatsapp?: string | null;
+  telefono?: string | null;
+  logoURL?: string | null;
+  estado?: string | null;
 }
 
-interface Empresa {
-  nombre: string;
-  logo: string;
+interface EmpresaDetalleResponse {
+  empresa: EmpresaDetalle;
+  logoUrl?: string | null;
+}
+
+interface ImagenPrincipal {
+  idMultimediaOferta?: number;
+  objectName?: string | null;
+  url?: string | null;
+  status?: boolean | null;
+}
+
+interface OfertaEmpresa {
+  idOferta: number;
+  titulo: string;
   descripcion: string;
-  whatsapp: string;
-  facebook: string;
-  instagram: string;
-  calificacion: number;
-  totalResenas: number;
-  servicios: Servicio[];
+  precio: number;
+  estado?: string | null;
+  imagenPrincipal?: ImagenPrincipal | null;
 }
 
 @Component({
@@ -29,53 +43,121 @@ interface Empresa {
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    HttpClientModule
   ],
   templateUrl: './perfil-empresa.component.html',
   styleUrl: './perfil-empresa.component.css'
 })
-export class PerfilEmpresaComponent implements OnInit{
+export class PerfilEmpresaComponent implements OnInit {
+  empresaId: number | null = null;
+  empresa: EmpresaDetalle | null = null;
+  logoUrl: string | null = null;
+  ofertas: OfertaEmpresa[] = [];
+  loadingEmpresa = false;
+  loadingOfertas = false;
+  errorMessage = '';
+  ofertasError = '';
 
-  empresa!: Empresa;
-  constructor(private route: ActivatedRoute) {}
+  private readonly detalleUrl = '/empresa/detalle';
+  private readonly ofertasUrl = '/oferta/empresa/listado';
+
+  constructor(private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id') || '1';
-    this.empresa = this.getEmpresaPorId(Number(id));
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const id = idParam ? Number(idParam) : null;
+    if (id == null || Number.isNaN(id)) {
+      this.errorMessage = 'No se encontro el identificador de la empresa.';
+      return;
+    }
+    this.empresaId = id;
+    this.cargarEmpresa(id);
+    this.cargarOfertas(id);
   }
 
-  private getEmpresaPorId(id: number) : Empresa{
-    const empresas: {[key: number] : Empresa} = {
-      1: {
-        nombre: "Kanoo Tours",
-        logo: "https://images.unsplash.com/photo-1560472355-5364e9e7c2b8?w=400",
-        descripcion: "Los pioneros del Salar de Uyuni desde 2010. Especialistas en tours 4x4, hoteles de sal y fotografía nocturna. Más de 15.000 aventureros felices.",
-        whatsapp: "+591 71234567",
-        facebook: "kanootours",
-        instagram: "kanootours_bolivia",
-        calificacion: 4.97,
-        totalResenas: 342,
-        servicios: [
-          { id: 1, titulo: "Salar de Uyuni 3D/2N – Espejo del Cielo", precio: 1450, duracion: "3 días", imagen: "https://images.unsplash.com/photo-1590524862241-1e90a250a5e8?w=800", calificacion: 4.97, resenas: 342 },
-          { id: 7, titulo: "Salar + Laguna Colorada 4D/3N", precio: 2150, duracion: "4 días", imagen: "https://images.unsplash.com/photo-1583417319070-4e4d9e5d7f1f?w=800", calificacion: 4.95, resenas: 189 },
-          { id: 8, titulo: "Tour Astronómico Salar de Uyuni", precio: 980, duracion: "1 noche", imagen: "https://images.unsplash.com/photo-1506905925346-5005b2d80e3d?w=800", calificacion: 5.0, resenas: 98 }
-        ]
+  getCiudadNombre(idCiudad?: number | null): string {
+    if (idCiudad == null) {
+      return 'Sin ciudad';
+    }
+    const ciudades = new Map<number, string>([
+      [1, 'La Paz'],
+      [2, 'El Alto'],
+      [3, 'Cochabamba'],
+      [4, 'Quillacollo'],
+      [5, 'Santa Cruz de la Sierra'],
+      [6, 'Montero'],
+      [7, 'Oruro'],
+      [8, 'Potosi'],
+      [9, 'Uyuni'],
+      [10, 'Sucre'],
+      [11, 'Tarija'],
+      [12, 'Trinidad'],
+      [13, 'Cobija']
+    ]);
+    return ciudades.get(idCiudad) ?? 'Sin ciudad';
+  }
+
+  getImagenOferta(oferta: OfertaEmpresa): string | null {
+    const imagen = oferta.imagenPrincipal;
+    if (imagen?.url) {
+      return imagen.url;
+    }
+    if (imagen?.objectName) {
+      return imagen.objectName;
+    }
+    return null;
+  }
+
+  private cargarEmpresa(idEmpresa: number) {
+    this.loadingEmpresa = true;
+    this.errorMessage = '';
+    const token = localStorage.getItem('token');
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    this.http.get<EmpresaDetalleResponse>(`${this.detalleUrl}/${idEmpresa}`, { headers }).subscribe({
+      next: (response) => {
+        this.empresa = response.empresa ?? null;
+        this.logoUrl = response.logoUrl ?? response.empresa?.logoURL ?? null;
+        this.loadingEmpresa = false;
       },
-      2: {
-        nombre: "Gravity Bolivia",
-        logo: "https://images.unsplash.com/photo-1581093458791-9ea2b0675f37?w=400",
-        descripcion: "Los reyes de la Death Road desde 1998. Bicicletas full suspensión, guías certificados y la bajada más adrenalínica del mundo.",
-        whatsapp: "+591 76543210",
-        facebook: "gravitybolivia",
-        instagram: "gravitybolivia",
-        calificacion: 4.95,
-        totalResenas: 567,
-        servicios: [
-          { id: 2, titulo: "Death Road Full Day", precio: 890, duracion: "1 día", imagen: "https://images.unsplash.com/photo-1506905925346-5005b2d80e3d?w=800", calificacion: 4.95, resenas: 567 },
-          { id: 9, titulo: "Death Road + Zipline Combo", precio: 1290, duracion: "1 día", imagen: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800", calificacion: 4.93, resenas: 210 }
-        ]
+      error: () => {
+        this.empresa = null;
+        this.logoUrl = null;
+        this.errorMessage = 'No se pudo cargar el perfil de la empresa.';
+        this.loadingEmpresa = false;
       }
-    };
-    return empresas[id] || empresas[1];
+    });
+  }
+
+  private cargarOfertas(idEmpresa: number) {
+    this.loadingOfertas = true;
+    this.ofertasError = '';
+    const token = localStorage.getItem('token');
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    this.http.get<OfertaEmpresa[]>(`${this.ofertasUrl}/${idEmpresa}`, { headers }).subscribe({
+      next: (response) => {
+        const ofertas = Array.isArray(response) ? response : [];
+        this.ofertas = ofertas.filter((oferta) => this.esAprobada(oferta.estado));
+        this.loadingOfertas = false;
+      },
+      error: () => {
+        this.ofertas = [];
+        this.ofertasError = 'No se pudieron cargar las ofertas de la empresa.';
+        this.loadingOfertas = false;
+      }
+    });
+  }
+
+  private esAprobada(estado?: string | null): boolean {
+    if (!estado) {
+      return true;
+    }
+    return estado.toLowerCase().startsWith('apro');
   }
 }
