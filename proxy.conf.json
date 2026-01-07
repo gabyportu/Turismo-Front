@@ -4,6 +4,16 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/auth/password/forgot": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/auth/password/reset": {
+    "target": "http://localhost:8112",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/empresa/registrar": {
     "target": "http://localhost:8112",
     "secure": false,

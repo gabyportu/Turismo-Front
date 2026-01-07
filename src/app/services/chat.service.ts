@@ -435,20 +435,34 @@ export class ChatService {
     const key = this.getConversationKey(turistaId, empresaId);
     const existing = this.conversacionesMap.get(key);
     const mensajes = existing ? [...existing.mensajes] : [];
-    if (msg.idConversacion != null) {
-      const exists = mensajes.some((item) => item.idConversacion === msg.idConversacion);
-      if (exists) {
-        return;
+    let replaced = false;
+    if (msg.esMio && msg.idConversacion != null) {
+      for (let i = mensajes.length - 1; i >= 0; i -= 1) {
+        const item = mensajes[i];
+        if (item.esMio && item.idConversacion == null && item.texto === msg.texto) {
+          mensajes[i] = { ...item, ...msg };
+          replaced = true;
+          break;
+        }
       }
     }
-    mensajes.push(msg);
-    const nombre = this.resolveConversationName(turistaId, empresaId, msg, existing?.empresa);
+    if (!replaced) {
+      if (msg.idConversacion != null) {
+        const exists = mensajes.some((item) => item.idConversacion === msg.idConversacion);
+        if (exists) {
+          return;
+        }
+      }
+      mensajes.push(msg);
+    }
+    const last = mensajes[mensajes.length - 1];
+    const nombre = this.resolveConversationName(turistaId, empresaId, last ?? msg, existing?.empresa);
     const conv: ChatConversacion = {
       idEmpresa: empresaId,
       idTurista: turistaId,
       empresa: nombre,
-      ultimoMensaje: msg.texto,
-      hora: msg.hora,
+      ultimoMensaje: last?.texto ?? msg.texto,
+      hora: last?.hora ?? msg.hora,
       mensajes,
       updatedAt: Date.now()
     };

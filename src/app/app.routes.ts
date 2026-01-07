@@ -9,6 +9,10 @@ export const routes: Routes = [
     {path: 'login', component: LoginSelectionComponent},
     {path: 'register/tourist', component: RegisterTouristComponent},
     {path: 'register/company', component: RegisterCompanyComponent},
+    {path: 'reset-password',
+        loadComponent: () => import('./auth/password/reset-password/reset-password.component')
+        .then(m => m.ResetPasswordComponent)
+    },
     {path: 'admin/login', component: LoginSelectionComponent},
     {path: 'admin/users-company',
         loadComponent: () => import('./admin/users-company/users-company.component')

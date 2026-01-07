@@ -8,7 +8,7 @@
 
     <!-- DOCUMENTO 1 -->
     <div class="bg-purple-50 rounded-2xl p-8 border-2 border-purple-200 shadow-lg">
-      <label class="block text-lg font-bold text-purple-800 mb-4">Documento 1 (Obligatorio)</label>
+      <label class="block text-lg font-bold text-purple-800 mb-4">NIT (Obligatorio)</label>
       <input type="file" #file1 hidden accept="application/pdf,image/*" (change)="onFileSelected($event, 1)">
       <button type="button" (click)="file1.click()"
               class="px-10 py-4 bg-gradient-to-r from-purple-600 to-purple-800 text-white text-lg font-bold rounded-full shadow-lg hover:scale-105 transition flex items-center gap-3 mx-auto">
@@ -24,7 +24,7 @@
 
     <!-- DOCUMENTO 2 -->
     <div class="bg-purple-50 rounded-2xl p-8 border-2 border-purple-200 shadow-lg">
-      <label class="block text-lg font-bold text-purple-800 mb-4">Documento 2 (Obligatorio)</label>
+      <label class="block text-lg font-bold text-purple-800 mb-4">Licencia de funcionamiento municipal (Obligatorio)</label>
       <input type="file" #file2 hidden accept="application/pdf,image/*" (change)="onFileSelected($event, 2)">
       <button type="button" (click)="file2.click()"
               class="px-10 py-4 bg-gradient-to-r from-purple-600 to-purple-800 text-white text-lg font-bold rounded-full shadow-lg hover:scale-105 transition flex items-center gap-3 mx-auto">

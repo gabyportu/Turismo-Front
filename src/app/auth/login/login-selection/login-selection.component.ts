@@ -49,17 +49,24 @@ export class LoginSelectionComponent {
   noticeMessage: string | null = null;
   noticeType: 'success' | 'error' | null = null;
   showPassword: boolean = false;
+  showForgotPassword: boolean = false;
+  forgotCorreo: string = '';
+  forgotNoticeMessage: string | null = null;
+  forgotNoticeType: 'success' | 'error' | null = null;
+  isSendingForgot: boolean = false;
 
   selected: 'company' | 'tourist' | null = null;
   tab: 'login' | 'admin' = 'login';
 
   private readonly loginUrl = '/auth/login';
+  private readonly forgotPasswordUrl = '/auth/password/forgot';
 
   constructor(private router: Router, private http: HttpClient) {}
 
   selectRole(role: 'company' | 'tourist') {
     this.selected = role;
     this.clearNotice();
+    this.clearForgotNotice();
   }
 
   goToRegister() {
@@ -106,8 +113,49 @@ export class LoginSelectionComponent {
     this.noticeMessage = null;
   }
 
+  private setForgotNotice(type: 'success' | 'error', message: string) {
+    this.forgotNoticeType = type;
+    this.forgotNoticeMessage = message;
+  }
+
+  private clearForgotNotice() {
+    this.forgotNoticeType = null;
+    this.forgotNoticeMessage = null;
+  }
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
+  }
+
+  toggleForgotPassword() {
+    this.showForgotPassword = !this.showForgotPassword;
+    if (this.showForgotPassword && !this.forgotCorreo && this.correo) {
+      this.forgotCorreo = this.correo;
+    }
+    this.clearForgotNotice();
+  }
+
+  sendForgotPassword() {
+    if (this.isSendingForgot) {
+      return;
+    }
+    this.clearForgotNotice();
+    const correo = this.forgotCorreo.trim();
+    if (!correo) {
+      this.setForgotNotice('error', 'Ingresa tu correo para recuperar la contrasena.');
+      return;
+    }
+    this.isSendingForgot = true;
+    this.http.post(this.forgotPasswordUrl, { correo }, { responseType: 'text' }).subscribe({
+      next: () => {
+        this.isSendingForgot = false;
+        this.setForgotNotice('success', 'Revisa tu correo para el enlace de restablecimiento.');
+      },
+      error: () => {
+        this.isSendingForgot = false;
+        this.setForgotNotice('error', 'No se pudo enviar el correo. Intenta nuevamente.');
+      }
+    });
   }
 
   private persistSession(

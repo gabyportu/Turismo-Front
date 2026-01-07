@@ -139,6 +139,47 @@
               </button>
             </div>
           </div>
+
+          <div class="mt-6 text-center">
+            <button type="button" (click)="toggleForgotPassword()" class="text-sm font-semibold text-gray-700 underline decoration-purple-400 hover:text-purple-700">
+              Olvidaste tu contrasena?
+            </button>
+          </div>
+
+          <div *ngIf="showForgotPassword" class="mt-6 rounded-2xl border border-white/60 bg-white/70 p-5 shadow-inner">
+            <p class="text-sm text-gray-700 text-center">
+              Te enviaremos un enlace para restablecer tu contrasena.
+            </p>
+
+            <div *ngIf="forgotNoticeMessage"
+                 class="mt-4 rounded-2xl border px-4 py-3 text-center text-sm font-semibold"
+                 [class.bg-emerald-100]="forgotNoticeType === 'success'"
+                 [class.text-emerald-800]="forgotNoticeType === 'success'"
+                 [class.border-emerald-300]="forgotNoticeType === 'success'"
+                 [class.bg-red-100]="forgotNoticeType === 'error'"
+                 [class.text-red-800]="forgotNoticeType === 'error'"
+                 [class.border-red-300]="forgotNoticeType === 'error'">
+              {{ forgotNoticeMessage }}
+            </div>
+
+            <div class="mt-4">
+              <input type="email" placeholder="Correo" name="forgotCorreo" [(ngModel)]="forgotCorreo"
+                     class="w-full px-4 py-3 text-sm rounded-2xl border-2 border-purple-200 focus:border-purple-600 outline-none">
+            </div>
+
+            <div class="mt-4">
+              <button type="button" (click)="sendForgotPassword()" [disabled]="isSendingForgot"
+                      class="w-full py-3 text-sm font-bold text-white rounded-2xl shadow-lg transition"
+                      [class.bg-gradient-to-r]="true"
+                      [class.from-purple-600]="selected === 'company'"
+                      [class.to-purple-800]="selected === 'company'"
+                      [class.from-emerald-600]="selected === 'tourist'"
+                      [class.to-emerald-800]="selected === 'tourist'"
+                      [class.opacity-70]="isSendingForgot">
+                {{ isSendingForgot ? 'Enviando...' : 'Enviar enlace' }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

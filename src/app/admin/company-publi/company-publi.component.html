@@ -49,18 +49,12 @@
       <div class="bg-white rounded-2xl shadow-xl p-6">
 
         <!-- FILTROS COMPACTOS (como en empresas) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 mb-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 mb-6">
           <input type="date" [(ngModel)]="fechaInicio" (change)="applyFilters()"
                  class="px-4 py-3 rounded-xl border border-purple-200 focus:border-purple-600 outline-none text-sm">
 
           <input type="date" [(ngModel)]="fechaFin" (change)="applyFilters()"
                  class="px-4 py-3 rounded-xl border border-purple-200 focus:border-purple-600 outline-none text-sm">
-
-          <select [(ngModel)]="ciudadFiltro" (change)="applyFilters()"
-                  class="px-4 py-3 rounded-xl border border-purple-200 focus:border-purple-600 outline-none text-sm">
-            <option value="">Ciudad</option>
-            <option *ngFor="let c of ciudades" [value]="c">{{ c }}</option>
-          </select>
 
           <button (click)="limpiarFiltros()"
                   class="px-4 py-3 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold rounded-xl text-sm">
@@ -92,7 +86,7 @@
                 <th class="px-5 py-3 text-left font-bold text-purple-800">Titulo</th>
                 <th class="px-5 py-3 text-left font-bold text-purple-800 hidden sm:table-cell">Empresa</th>
                 <th class="px-5 py-3 text-left font-bold text-purple-800 hidden md:table-cell">Fecha</th>
-                <th class="px-5 py-3 text-left font-bold text-purple-800 hidden lg:table-cell">Ciudad</th>
+                <th class="px-5 py-3 text-left font-bold text-purple-800 hidden lg:table-cell">Detalle</th>
                 <th class="px-5 py-3 text-center font-bold text-purple-800">Estado</th>
                 <th class="px-5 py-3 text-center font-bold text-purple-800">Ver</th>
               </tr>
@@ -112,8 +106,8 @@
                   {{ p.fecha }}
                 </td>
                 <td class="px-5 py-4 text-gray-700 hidden lg:table-cell">
-                  <div class="block sm:hidden text-xs text-purple-600 mb-1">Ciudad</div>
-                  {{ p.ciudad }}
+                  <div class="block sm:hidden text-xs text-purple-600 mb-1">Detalle</div>
+                  {{ p.descripcion }}
                 </td>
                 <td class="px-5 py-4 text-center">
                   <span class="px-3 py-1.5 rounded-full text-xs font-bold"
@@ -137,6 +131,7 @@
                   </button>
                   <button
                       class="bg-green-100 hover:bg-green-200 rounded-full w-10 h-10 shadow transition-all hover:scale-110"
+                      (click)="aprobarOferta(p.id)"
                       title="Aprobar">
                       <svg class="w-5 h-5 text-green-700 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -145,6 +140,7 @@
 
                     <button
                       class="bg-red-100 hover:bg-red-200 rounded-full w-10 h-10 shadow transition-all hover:scale-110"
+                      (click)="rechazarOferta(p.id)"
                       title="Rechazar">
                       <svg class="w-5 h-5 text-red-700 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -161,6 +157,39 @@
 
         <div class="mt-6 text-center text-purple-700 font-medium text-sm">
           {{ dataSource.length }} publicacion{{ dataSource.length !== 1 ? 'es' : '' }}
+        </div>
+      </div>
+
+      <div *ngIf="confirmOpen" class="fixed inset-0 z-50 flex items-center justify-center p-6">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="confirmCancelar()"></div>
+        <div class="relative w-full max-w-lg rounded-3xl bg-white shadow-3xl border border-white/60 overflow-hidden">
+          <div class="h-2 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600"></div>
+          <div class="p-8 text-center">
+            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
+                 [ngClass]="confirmAction === 'aprobar' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
+              <span class="material-icons text-4xl">
+                {{ confirmAction === 'aprobar' ? 'check_circle' : 'cancel' }}
+              </span>
+            </div>
+            <h3 class="text-2xl font-black text-purple-800">Confirmar accion</h3>
+            <p class="mt-3 text-gray-700">
+              Deseas {{ confirmAction === 'aprobar' ? 'aprobar' : 'rechazar' }} la oferta
+              <span class="font-bold text-purple-700">{{ confirmOferta?.titulo }}</span>?
+            </p>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center px-8 pb-8">
+            <button type="button" (click)="confirmCancelar()"
+                    class="px-8 py-3 border-2 border-purple-600 text-purple-700 text-lg font-bold rounded-full hover:bg-purple-50 transition">
+              Cancelar
+            </button>
+            <button type="button" (click)="confirmAceptar()"
+                    class="px-8 py-3 text-white text-lg font-bold rounded-full shadow-lg transition"
+                    [ngClass]="confirmAction === 'aprobar'
+                      ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 hover:scale-105'
+                      : 'bg-gradient-to-r from-red-600 to-red-700 hover:scale-105'">
+              Si, continuar
+            </button>
+          </div>
         </div>
       </div>
     </main>

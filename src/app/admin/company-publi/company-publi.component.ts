@@ -19,8 +19,6 @@ interface Publicacion {
   empresa: string;
   fecha: string;
   estado: 'pendiente' | 'aprobada' | 'rechazada';
-  ciudadId: number | null;
-  ciudad: string;
   descripcion: string;
 }
 
@@ -38,11 +36,6 @@ interface OfertaPendiente {
   status: boolean;
   idCiudad?: number | null;
   ciudad?: string | null;
-}
-
-interface CiudadCatalogo {
-  id: number;
-  nombre: string;
 }
 
 @Component({
@@ -66,28 +59,24 @@ interface CiudadCatalogo {
   styleUrl: './company-publi.component.css'
 })
 export class CompanyPubliComponent implements OnInit {
-  columnas = ['Titulo', 'Empresa', 'Fecha', 'Ciudad', 'Estado', 'Descripcion', 'Acciones'];
-
   publicaciones: Publicacion[] = [];
   dataSource: Publicacion[] = [];
   loading = false;
   errorMessage = '';
+  confirmOpen = false;
+  confirmAction: 'aprobar' | 'rechazar' | null = null;
+  confirmOferta: Publicacion | null = null;
   private readonly pendientesUrl = '/oferta/pendientes';
-  private readonly ciudadesUrl = '/catalogos/ciudades';
-  private readonly ciudadesUrlDirect = 'http://localhost:8112/catalogos/ciudades';
-  private ciudadesMap = new Map<number, string>();
+  private readonly aprobarUrl = 'http://localhost:8112/admin/oferta/aprobar';
+  private readonly rechazarUrl = 'http://localhost:8112/admin/oferta/rechazar';
 
   fechaInicio: string | null = null;
   fechaFin: string | null = null;
-  ciudadFiltro = '';
   busquedaRapida = '';
-
-  ciudades: string[] = [];
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.cargarCiudades();
     this.cargarPendientes();
   }
 
@@ -102,20 +91,17 @@ export class CompanyPubliComponent implements OnInit {
     this.http.get<OfertaPendiente[]>(this.pendientesUrl, { headers }).subscribe({
       next: (response) => {
         this.publicaciones = response.map((oferta) => {
-          const ciudadId = this.getCiudadId(oferta);
           return {
             id: oferta.idOferta,
             companyId: oferta.idEmpresa,
             titulo: oferta.titulo,
             empresa: `Empresa #${oferta.idEmpresa}`,
             fecha: oferta.fechaCreacion || oferta.fechaInicio,
-            ciudadId,
-            ciudad: this.getCiudadNombre(ciudadId, oferta.ciudad),
             estado: this.normalizarEstado(oferta.estado),
             descripcion: oferta.descripcion
           };
         });
-        this.actualizarCiudadesEnPublicaciones();
+        this.applyFilters();
         this.loading = false;
       },
       error: () => {
@@ -127,21 +113,8 @@ export class CompanyPubliComponent implements OnInit {
     });
   }
 
-  cargarCiudades() {
-    const token = localStorage.getItem('token');
-    const headers = token
-      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
-      : undefined;
-
-    this.fetchCiudades(this.ciudadesUrl, headers, Boolean(token));
-  }
-
   applyFilters() {
     let filtered = this.publicaciones;
-
-    if (this.ciudadFiltro) {
-      filtered = filtered.filter((p) => p.ciudad === this.ciudadFiltro);
-    }
 
     if (this.fechaInicio) {
       const inicio = this.parseDateValue(this.fechaInicio);
@@ -168,7 +141,6 @@ export class CompanyPubliComponent implements OnInit {
       filtered = filtered.filter((p) =>
         p.titulo.toLowerCase().includes(query) ||
         p.empresa.toLowerCase().includes(query) ||
-        p.ciudad.toLowerCase().includes(query) ||
         p.estado.toLowerCase().includes(query) ||
         p.fecha.toLowerCase().includes(query) ||
         p.descripcion.toLowerCase().includes(query)
@@ -185,9 +157,52 @@ export class CompanyPubliComponent implements OnInit {
   limpiarFiltros() {
     this.fechaInicio = null;
     this.fechaFin = null;
-    this.ciudadFiltro = '';
     this.busquedaRapida = '';
     this.applyFilters();
+  }
+
+  aprobarOferta(idOferta: number) {
+    const oferta = this.publicaciones.find((pub) => pub.id === idOferta);
+    if (!oferta) {
+      return;
+    }
+    this.confirmAction = 'aprobar';
+    this.confirmOferta = oferta;
+    this.confirmOpen = true;
+  }
+
+  rechazarOferta(idOferta: number) {
+    const oferta = this.publicaciones.find((pub) => pub.id === idOferta);
+    if (!oferta) {
+      return;
+    }
+    this.confirmAction = 'rechazar';
+    this.confirmOferta = oferta;
+    this.confirmOpen = true;
+  }
+
+  confirmAceptar() {
+    if (!this.confirmOferta || !this.confirmAction) {
+      this.confirmOpen = false;
+      return;
+    }
+
+    const idOferta = this.confirmOferta.id;
+    if (this.confirmAction === 'aprobar') {
+      this.ejecutarAccionOferta(`${this.aprobarUrl}/${idOferta}`, idOferta);
+    } else {
+      this.ejecutarAccionOferta(`${this.rechazarUrl}/${idOferta}`, idOferta);
+    }
+
+    this.confirmOpen = false;
+    this.confirmAction = null;
+    this.confirmOferta = null;
+  }
+
+  confirmCancelar() {
+    this.confirmOpen = false;
+    this.confirmAction = null;
+    this.confirmOferta = null;
   }
 
   private normalizarEstado(estado: string | null | undefined): Publicacion['estado'] {
@@ -202,33 +217,6 @@ export class CompanyPubliComponent implements OnInit {
       return 'rechazada';
     }
     return 'pendiente';
-  }
-
-  private actualizarCiudadesEnPublicaciones() {
-    if (!this.publicaciones.length) {
-      return;
-    }
-    this.publicaciones = this.publicaciones.map((pub) => ({
-      ...pub,
-      ciudad: this.getCiudadNombre(pub.ciudadId, pub.ciudad)
-    }));
-    this.applyFilters();
-  }
-
-  private getCiudadId(oferta: OfertaPendiente): number | null {
-    const id = Number(oferta.idCiudad);
-    return Number.isFinite(id) ? id : null;
-  }
-
-  private getCiudadNombre(ciudadId: number | null, fallback?: string | null): string {
-    if (ciudadId != null) {
-      const nombre = this.ciudadesMap.get(ciudadId);
-      if (nombre) {
-        return nombre;
-      }
-    }
-    const value = (fallback ?? '').trim();
-    return value || 'Sin ciudad';
   }
 
   private parseDateValue(value: string | Date | null | undefined): Date | null {
@@ -253,26 +241,19 @@ export class CompanyPubliComponent implements OnInit {
     return null;
   }
 
-  private fetchCiudades(url: string, headers?: HttpHeaders, retryWithoutAuth = false) {
-    this.http.get<CiudadCatalogo[]>(url, { headers }).subscribe({
-      next: (response) => {
-        const ciudades = Array.isArray(response) ? response : [];
-        this.ciudadesMap = new Map(ciudades.map((ciudad) => [ciudad.id, ciudad.nombre]));
-        this.ciudades = ciudades.map((ciudad) => ciudad.nombre);
-        this.actualizarCiudadesEnPublicaciones();
+  private ejecutarAccionOferta(url: string, idOferta: number) {
+    const token = localStorage.getItem('token');
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    this.http.put(url, {}, { headers, responseType: 'text' }).subscribe({
+      next: () => {
+        this.publicaciones = this.publicaciones.filter((pub) => pub.id !== idOferta);
+        this.applyFilters();
       },
       error: () => {
-        if (retryWithoutAuth) {
-          this.fetchCiudades(url, undefined, false);
-          return;
-        }
-        if (url !== this.ciudadesUrlDirect) {
-          this.fetchCiudades(this.ciudadesUrlDirect, undefined, false);
-          return;
-        }
-        this.ciudadesMap = new Map();
-        this.ciudades = [];
-        this.actualizarCiudadesEnPublicaciones();
+        this.errorMessage = 'No se pudo actualizar el estado de la oferta.';
       }
     });
   }
